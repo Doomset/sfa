@@ -1,0 +1,21 @@
+return
+{
+    {info = "Обход кика", action = "NoKick()"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, key = 1024}"},
+    {info = "", action = "sampSendDialogResponse(390,1,3, _)"},
+    {info = "", action = "sampSendDialogResponse(162,1,-1, _)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НИ СНЕГ'}"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "sampCloseCurrentDialogWithButton(0)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НИ ДОЖДЬ' }"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НИ ДИКАЯ ЖАРА' }"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НИ СУМРАК НОЧИ'}"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НЕ ОСТАНОВЯТ ПОСЫЛЬНЫХ' }"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'НА ПОЛПУТИ ОТ МЕСТА' }"},
+    {info = "Задержка 0.5 сек", action = "wait(500)"},
+    {info = "", action = "SendSync{ pos = {2816.8369140625, -1175.2595214844, 1525.5699462891}, mes = 'ПОСЛЕДНЕГО ИЗ ПИСЕМ'}"},
+}

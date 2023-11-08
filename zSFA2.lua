@@ -1,0 +1,633 @@
+local trace_log, print = {}, print
+trace = function(mes)
+	print(mes)
+	trace_log[#trace_log + 1] = mes
+end
+local _require = require
+script_properties("work-in-pause")
+
+--if not package.loading then package.loading = {} end
+
+
+-- unload_req = function(mod)
+-- 	req = nil
+-- 	package.loading[mod] = nil
+-- end
+
+-- 
+
+-- require "ziplib.dll"
+consolLog = {}
+addConsole = function(...)
+	print(...)
+	table.insert(consolLog, table.concat({...}, ", "))
+end
+
+
+local count_init = 0
+require = function(n)
+	--n = n:gsub('sfa', 'test_sfa')
+	local name = _require(n)
+
+	local con, log = table.concat, trace
+
+	count_init = count_init + 1
+
+	--log(con({ thisScript().name , 'INIT DEPEND', n, tostring(res), tostring(name), count_init }, ' '))
+	--print(_M[name])
+	return name
+end
+
+function getFilesInPath(path, ftype)
+	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
+	table.insert(Files, File)
+	while File do
+		File = findNextFile(SearchHandle)
+		table.insert(Files, File)
+	end
+	return Files
+end
+
+
+
+---@diagnostic disable: deprecated, lowercase-global, param-type-mismatch
+require("moonloader")
+
+local ffi = require 'ffi'
+
+weapons = require 'game.weapons'
+local mem = require 'memory'
+local encoding = require 'encoding'
+encoding.default                = 'CP1251'
+u8                              = encoding.UTF8
+
+do local a=getmetatable("String")function a.__index:insert(b,pos)if pos==nil then return self..b end;return self:sub(1,pos)..b..self:sub(pos+1)end;function a.__index:extract(c)self=self:gsub(c,"")return self end;function a.__index:array()local d={}for e in self:gmatch(".")do d[#d+1]=e end;return d end;function a.__index:isEmpty()return self:find("%S")==nil end;function a.__index:isDigit()return self:find("%D")==nil end;function a.__index:isAlpha()return self:find("[%d%p]")==nil end;function a.__index:split(f,g)assert(not f:isEmpty(),"Empty separator")result,pos={},1;repeat local e,h=self:find(f or" ",pos,g)result[#result+1]=self:sub(pos,e and e-1)pos=h and h+1 until pos==nil;return result end;local i=string.lower;function a.__index:lower()for j=192,223 do self=self:gsub(string.char(j),string.char(j+32))end;self=self:gsub(string.char(168),string.char(184))return i(self)end;local k=string.upper;function a.__index:upper()for j=224,255 do self=self:gsub(string.char(j),string.char(j-32))end;self=self:gsub(string.char(184),string.char(168))return k(self)end;function a.__index:isSpace()return self:find("^[%s%c]+$")~=nil end;function a.__index:isUpper()return self:upper()==self end;function a.__index:isLower()return self:lower()==self end;function a.__index:isSimilar(l)return self==l end;function a.__index:isTitle()local m=self:find("[A-zА-яЁё]")local n=self:sub(m,m)return n:isSimilar(n:upper())end;function a.__index:startsWith(l)return self:sub(1,#l):isSimilar(l)end;function a.__index:endsWith(l)return self:sub(#self-#l+1,#self):isSimilar(l)end;function a.__index:capitalize()local o=self:sub(1,1):upper()self=self:gsub("^.",o)return self end;function a.__index:tabsToSpace(p)local q=(" "):rep(p or 4)self=self:gsub("\t",q)return self end;function a.__index:spaceToTabs(p)local q=(" "):rep(p or 4)self=self:gsub(q,"t")return self end;function a.__index:center(r,s)local t=r-#self;local e=string.rep(s or" ",t)return e:insert(self,math.ceil(t/2))end;function a.__index:count(u,v,w)assert(not u:isEmpty(),"Empty search")local x=self:sub(v or 1,w or#self)local p,pos=0,v or 1;repeat local e,h=x:find(u,pos,true)p=e and p+1 or p;pos=h and h+1 until pos==nil;return p end;function a.__index:trimEnd()self=self:gsub("%s*$","")return self end;function a.__index:trimStart()self=self:gsub("^%s*","")return self end;function a.__index:trim()self=self:match("^%s*(.-)%s*$")return self end;function a.__index:swapCase()local result={}for e in self:gmatch(".")do if e:isAlpha()then e=e:isLower()and e:upper()or e:lower()end;result[#result+1]=e end;return table.concat(result)end;function a.__index:splitEqually(r)assert(r>0,"Width less than zero")assert(r<=self:len(),"Width is greater than the string length")local result,j={},1;repeat if#result==0 or#result[#result]>=r then result[#result+1]=""end;result[#result]=result[#result]..self:sub(j,j)j=j+1 until j>#self;return result end;function a.__index:rFind(c,pos,g)local j=pos or#self;repeat local result={self:find(c,j,g)}if next(result)~=nil then return table.unpack(result)end;j=j-1 until j<=0;return nil end;function a.__index:wrap(r)assert(r>0,"Width less than zero")assert(r<self:len(),"Width is greater than the string length")local pos=1;self=self:gsub("(%s+)()(%S+)()",function(y,z,A,B)if B-pos>(r or 72)then pos=z;return"\n"..A end end)return self end;function a.__index:levDist(l)if#self==0 then return#l elseif#l==0 then return#self elseif self==l then return 0 end;local C=0;local D={}for j=0,#self do D[j]={}D[j][0]=j end;for j=0,#l do D[0][j]=j end;for j=1,#self,1 do for E=1,#l,1 do C=self:byte(j)==l:byte(E)and 0 or 1;D[j][E]=math.min(D[j-1][E]+1,D[j][E-1]+1,D[j-1][E-1]+C)end end;return D[#self][#l]end;function a.__index:getSimilarity(l)local F=self:levDist(l)return 1-F/math.max(#self,#l)end;function a.__index:empty()return""end;function a.__index:toCamel()local G=self:array()for j,n in ipairs(G)do G[j]=j%2==0 and n:lower()or n:upper()end;return table.concat(G)end;function a.__index:shuffle(H)math.randomseed(H or os.clock())local G,I=self:array(),{}for j=1,#G do I[j]=G[math.random(#G)]end;return table.concat(I)end end
+
+
+msg = function(...)
+    if not isSampAvailable() then return end
+	if type(...) == "table" then text = encodeJson(...) else
+		local temp = {...}
+		for k, v in ipairs(temp) do
+			if type(v) ~= "string" then
+
+				temp[k] =  type(v) == "table" and encodeJson(v) or (msg_debug and type(v) or "")..tostring(v)
+			end
+		end
+		text = table.concat(temp, ", ")
+	end
+    sampAddChatMessage('{8952ff}[SFA]: {ffffff}'..text, 0xFF8952ff)
+end
+ProcessLog = {
+	
+}
+
+Loaded_Icons = {"arrow_left", 'ARROWS_ROTATE', "TRASH", "ARROW_DOWN", "ARROW_UP", "GEAR", "MAGNIFYING_GLASS"}
+
+
+cfg = require('sfa.Config')(SFA_settings,  "\\lib\\sfa\\settings.json")
+
+
+
+require 'sfa.samp'
+
+
+require('sfa.imgui.onInitialize')
+require("sfa.timer")
+
+Pickup = function(pickup_name)
+	for _, v in pairs(cfg.Пикапы) do
+		
+		if v.name:lower():find(pickup_name:lower()) then
+			return v.id
+		end
+	end
+	return false
+end
+
+
+
+BlockSync, SendSyncBlock = false, false
+
+font = {}
+
+blockNextTd = false
+indicatorArts = 0
+
+msg_debug = false
+
+
+
+
+
+
+pickwindow = false
+
+
+
+
+script_name("sfa")
+
+saveJson = cfg
+
+
+--require("sfa.imgui.imgui")
+
+
+
+
+
+local function isCarLightsOn(car)
+    return readMemory(getCarPointer(car) + 0x428, 1) > 62
+end
+
+
+--h("dialog")
+
+check_car = function(c)
+	local store, time, vehs = storeCarCharIsInNoSave, timer.exist("abuse"), getAllVehicles()
+
+	if time then return -1, "no need abuse" end
+
+	if #vehs < 1 then return false, "no car" end
+
+	if isCharInAnyCar(PLAYER_PED) and isCarLightsOn(store(PLAYER_PED)) then
+		return select(2, sampGetVehicleIdByCarHandle(store(PLAYER_PED))), "ped car"
+	end
+
+
+
+	for k, hand in ipairs(vehs) do
+		local res, id = sampGetVehicleIdByCarHandle(hand)
+		if res and doesVehicleExist(hand) and store(PLAYER_PED) ~= hand then
+			return id, "nearcar"
+		end
+	end
+
+	return false, "no car"
+end
+
+
+
+
+WARN_ABUSE = function()
+	timer("abuse", 6)
+	if timer.exist("abuse2") then return end
+	msg("вывыввыввы")
+	handler("player_pos", {2903.17})
+	SendSync{pos = {1292, 1580, 42}, key = 2, force = true, manual = "player"}
+	sampForceOnfootSync()
+	timer("abuse2", 6)
+end
+
+
+
+
+lastcheck = {}
+
+
+
+
+
+
+
+
+resX, resY = getScreenResolution()
+
+cricle = true
+local wm  = require('lib.windows.message')
+
+
+shortPos = function(x, y, z)
+	local round = function(num, idp)
+        local mult = 10^(idp or 0)
+        return math.floor(num * mult + 0.5) / mult
+    end
+	return round(x + y + z, 2)
+end
+
+
+
+local consolLog = {}
+
+
+
+
+
+
+function isAnyCheckpointExist()
+	local misc = sampGetMiscInfoPtr()
+	if misc == 0 then return false end
+	local defoult, race = mem.getint32(misc + 0x24) == 1, mem.getint32(misc + 0x49) == 1
+	local pPos = defoult and (misc + 0xC) or (misc + 0x2C)
+	return (defoult or race), mem.getfloat(pPos), mem.getfloat(pPos + 0x4), mem.getfloat(pPos + 0x8), defoult and 0 or 1
+end
+
+
+
+
+
+
+
+
+pL = function(...)
+	table.insert(ProcessLog, ...)
+end
+
+
+
+sendPos = function(data)
+	local t, delay, tp, key, pick = data["t"], data["delay"], data["tp"], data["key"], data["pick"]
+
+	for k, v in ipairs(t) do
+
+		NoKick()
+
+		if tp then setCharCoordinates(PLAYER_PED, v[1], v[2], v[3]) else
+			if not fast then
+				SendSync{pos ={v[1], v[2], v[3]}, key = key or v.key, pick = pick or v.pick, force = true, surf = 2333}
+			else
+				exSyncKey{pos ={v[1], v[2], v[3]}, key = key or v.key, force = true, surf = 2333}
+			end
+
+			pL(encodeJson(data))
+		end
+
+		if (delay ~= nil and k ~= #t) then
+			wait(delay)
+			pL('wait(delay)')
+		end
+	end
+end
+
+
+
+function setCharCoordinatesDontResetAnim(char, x, y, z)
+	if doesCharExist(char) then
+		local entityPtr = getCharPointer(char)
+		if entityPtr ~= 0 then
+			local matrixPtr = readMemory(entityPtr + 0x14, 4, false)
+			if matrixPtr ~= 0 then
+				local posPtr = matrixPtr + 0x30
+				writeMemory(posPtr + 0, 4, representFloatAsInt(x), false) --X
+				writeMemory(posPtr + 4, 4, representFloatAsInt(y), false) --Y
+				writeMemory(posPtr + 8, 4, representFloatAsInt(z), false) --Z
+			end
+		end
+	end
+end
+
+
+
+
+
+
+
+
+exSync = function(d)
+	assert(type(d) == "table", "struct")
+	local p, pick, key = d["pos"],  d["p"],  d["key"]
+	BlockSync = true
+	SendSync{pos = {p[1], p[2], p[3] - 12}, key = key, weapon = 40}; Задержка(1); SendSync{pick = pick}
+	BlockSync = false
+end
+
+
+
+exSyncKey  = function(d)
+	assert(type(d) == "table", "struct")
+	local p, key = d["pos"],   d["key"]
+	BlockSync = true
+	SendSync{pos = {p[1], p[2], p[3] - 12}, surf = 2333}; Задержка(1.05); SendSync{pos = {p[1], p[2], p[3]}, key = 1024, surf = 2333}
+end
+
+
+
+
+
+
+
+
+
+
+
+
+script_version(2)
+
+
+
+
+local function url_encode(text)
+	if not text:find('[\128-\255]') then return text end
+    text = string.gsub(text, "[\128-\255]", function(c) return string.format("%%%02X", string.byte(c)) end)
+    return u8(text)
+end
+
+
+
+local directory = function (dir)
+	dir = dir:gsub('/', '\\')
+	if doesDirectoryExist(dir) then return end
+	local res = createDirectory(dir)
+	Noti('Папки не существует - создание '..dir, res and OK or ERROR)
+end
+
+
+
+local rename = function (mode, git_path)
+	local p = git_path:gsub('data', 'old')
+
+	if mode and  doesFileExist(p) then
+		os.rename(p, git_path)
+		Noti('Вернул оригинальное название')
+		return p
+	end
+
+	if doesFileExist(p)  then
+		Noti('Удалил старый файл')
+		os.remove(p)
+	end
+
+
+	if not doesFileExist(git_path) then return end
+	Noti('Переминовал старый файл')
+	os.rename(git_path, p)
+end
+
+
+
+
+local read_file = function (file)
+	local f, msg = io.open(file, 'r')
+	if not f then return false end
+	local file = u8:decode(f:read('*a'))
+	f:close()
+	local table = decodeJson(file)
+	return table, file
+end
+
+
+
+local check_hash = function(name, hash, git)-- сравнение кеша из старых файлах в новых
+	for _, v in ipairs(git.tree) do
+		if v.path == name and v.sha ~= hash and v.type ~= 'tree' then print('Обнаружено обновление ! '..name) return true end
+	end
+	return false
+end
+
+
+
+local dlstatus = require('moonloader').download_status
+
+local for_download
+local process_update
+local abort_update = false
+local status_text = 'dddd'
+
+local git_path = getWorkingDirectory()..'\\sfa\\data.json'
+
+local file_count = 0
+
+
+
+local update_thread = nil
+
+local update = function ()
+
+	if update_thread ~= nil and not update_thread.dead then Noti('На данный момент идет проверка') return false end
+
+
+	
+
+	update_thread = lua_thread.create(function ()
+
+	
+		Noti('Вызвана')
+			
+		process_update = nil
+
+		abort_update = false
+		for_download = nil
+		
+		file_count = 0
+		directory(getWorkingDirectory()..'\\sfa')
+
+
+		local no_need_download = function (n)
+			return not n:find'settings.json'
+		end	
+		
+
+		for_download = {} -- таблица для скачки
+		
+
+		local finish = function ()
+			update_thread:terminate()
+			update_thread = nil
+		end
+
+
+
+		local verify_files = function (git_data, oldgit_data)
+
+			if not git_data then return end
+
+			local result = true
+			for _, v in ipairs(git_data.tree) do
+				local p = getWorkingDirectory()..'\\sfa\\'..v.path
+				local exist_file = doesFileExist(p)
+				if v.type == 'tree' then
+					directory(p)
+				elseif (not exist_file) and no_need_download(v.path) then
+					print('файла не существует! '..v.path)
+					table.insert(for_download, {path = v.path, size = v.size, update = false})
+					result = false
+				elseif oldgit_data and no_need_download(v.path) and check_hash(v.path, v.sha, oldgit_data) then
+					
+					table.insert(for_download, {path = v.path, size = v.size, update = true})
+				end
+				
+			end
+
+			local text = result and 'Все файлы прошли проверку' or  "Файлов не прошедших проверку "..#for_download
+			Noti(text, result and OK or ERROR)
+
+			if result then finish() end
+
+			return result
+		end
+		
+	
+
+		local downlanded_git
+		status_text = 'загрузка конфига'
+		local url_git = "https://api.github.com/repositories/654672350/git/trees/master?recursive=1" -- закачка нового гита
+
+		
+		local p = git_path:gsub('data', 'old')
+		if doesFileExist(p) then
+			os.rename(p, git_path)
+			Noti('Вернул оригинальное название')
+		end
+
+
+		local old_git, old_git_file = read_file(git_path) -- старый прочитан
+
+
+		rename(false, git_path)	
+
+		
+
+		downloadUrlToFile(url_git, git_path, function(id, status)
+			
+			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+				-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
+				downlanded_git = read_file(git_path) -- скачан новый
+
+				if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
+
+					rename(1, git_path) -- вернуть наw
+				
+					Noti("Не удалось получить новые данные\nСсылка для скачки была скопирована в буфер обмена", ERROR)
+			
+
+	
+					if old_git then
+						Noti('Запущена проверка целостности')
+						verify_files(old_git)
+						status_text = text
+					else finish() end
+
+
+
+					return
+				end
+
+
+				os.remove(git_path:gsub('data', 'old'))
+
+				cfg.req_limit = cfg.req_limit + 1
+
+				cfg()
+
+				Noti('Число запрососв '..cfg.req_limit)
+
+				if old_git then -- если старый файл существует
+					if (old_git.sha == downlanded_git.sha) then -- проверяем хеши закачаного и старого
+						Noti('Обновления не требуются', OK)
+						Noti('Запущена проверка целостности')
+						local is_ok = verify_files(downlanded_git) -- верификация файлов
+					else
+						Noti('Обнаружен апдейт', INFO)
+						verify_files(downlanded_git, old_git) -- хеш конфигов не совппадает, проверка на обновление файлов
+					end
+				
+				else  -- старого файла не существует, проверка наличие файлов в новом!
+					Noti('Старый гит не был найден\nначал проверку на наличие файлов в закачаном')
+					verify_files(downlanded_git)
+				end
+
+			end
+		end)
+
+	-- тут происходит закачка всей структуры в свежесозданную папку
+		
+		while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(30) end
+
+
+		if #for_download == 0 then status_text = 'Обновления не требуются' return false end
+
+		dildo = #for_download
+		Noti('Будет скачено файлво '..#for_download or 0)
+
+		for index, v in ipairs(for_download) do
+			local url = 'https://raw.githubusercontent.com/Doomset/gaysex/master/'..url_encode(u8(v.path))
+
+			local moonDir = getWorkingDirectory()
+			local path = v.path:find('zSFA2') and moonDir..'\\zSFA2.lua' or (moonDir.. '\\sfa\\'..v.path)
+			
+			local downlaod = function (text, update)
+				downloadUrlToFile(url, path,
+				function(id, status, p1, p2)
+					process_update = true
+					status_text = 'файл качается '..v.path
+
+					if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+
+						if not doesFileExist(path) then Noti('chto to poshlo ne tak'..path, ERROR) return false end
+
+						status_text = 'скачан '..v.path
+
+						file_count = file_count + 1
+
+						
+						table.remove(for_download, #for_download)
+						print(text)
+					--	Noti(text..' '..#for_download..' '..index, INFO)
+						if #for_download ==  0 then
+							Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО ЗАПУЩЕНА ПРОВЕРКА'..path)
+
+							local is_ok = verify_files(downlanded_git)
+							status_text = 'Все'
+							--finish()
+						end
+					end
+				end)
+			end
+			downlaod('Downloaded! '..v.path, v.update)
+		end
+		
+
+	end)
+end
+
+
+sampRegisterChatCommand('sfa_checkupd', update)
+
+
+addEventHandler('onScriptTerminate', function(LuaScript, quitGame)
+	if LuaScript == thisScript() then
+		rename(1, git_path)
+	end
+end)
+
+
+main = function()
+	while not isSampAvailable() do wait(300) end
+	--initializeModels()
+	
+
+	
+
+	Noti('SFA - успешно загружен!')
+	-- timer('update', 1, function ()
+	-- 	update()
+	-- end)
+
+	if cfg.debug then
+		local path = script.this.path
+		local f = io.open(path, 'r')
+		local sfa_content = f:read('*a')
+		f:close()
+	
+		local f = io.open(getWorkingDirectory().. '\\lib\\sfa\\zSFA2.lua', 'w')
+		f:write(sfa_content)
+		f:close()
+	end
+	
+	
+	while true do
+
+
+        wait(0)
+    end
+end
+
+
+
+
+
+
+
+
+
