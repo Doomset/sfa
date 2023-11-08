@@ -76,7 +76,7 @@ msg = function(...)
 		end
 		text = table.concat(temp, ", ")
 	end
-    sampAddChatMessage('{8952ff}[SFA]: {ffffff}'..text, 0xFF8952ff)
+    sampAddChatMessage('{8952ff}[sfa]: {ffffff}'..text, 0xFF8952ff)
 end
 ProcessLog = {
 	
@@ -85,9 +85,18 @@ ProcessLog = {
 Loaded_Icons = {"arrow_left", 'ARROWS_ROTATE', "TRASH", "ARROW_DOWN", "ARROW_UP", "GEAR", "MAGNIFYING_GLASS"}
 
 
-cfg = require('sfa.Config')(SFA_settings,  "\\lib\\sfa\\settings.json")
+cfg = require('sfa.Config')(sfa_settings,  "\\sfa\\settings.json")
 
+if cfg.debug then
+	local path = script.this.path
+	local f = io.open(path, 'r')
+	local sfa_content = f:read('*a')
+	f:close()
 
+	local f = io.open(getWorkingDirectory().. '\\lib\\1sfa\\zsfa2.lua', 'w')
+	f:write(sfa_content)
+	f:close()
+end
 
 require 'sfa.samp'
 
@@ -461,7 +470,7 @@ local update = function ()
 
 		local downlanded_git
 		status_text = 'загрузка конфига'
-		local url_git = "https://api.github.com/repositories/654672350/git/trees/master?recursive=1" -- закачка нового гита
+		local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursive=1" -- закачка нового гита
 
 		
 		local p = git_path:gsub('data', 'old')
@@ -541,10 +550,10 @@ local update = function ()
 		Noti('Будет скачено файлво '..#for_download or 0)
 
 		for index, v in ipairs(for_download) do
-			local url = 'https://raw.githubusercontent.com/Doomset/gaysex/master/'..url_encode(u8(v.path))
+			local url = 'https://raw.githubusercontent.com/doomset/sfa/main/'..url_encode(u8(v.path))
 
 			local moonDir = getWorkingDirectory()
-			local path = v.path:find('zSFA2') and moonDir..'\\zSFA2.lua' or (moonDir.. '\\sfa\\'..v.path)
+			local path = v.path:find('zsfa2') and moonDir..'\\zsfa2.lua' or (moonDir.. '\\sfa\\'..v.path)
 			
 			local downlaod = function (text, update)
 				downloadUrlToFile(url, path,
@@ -599,28 +608,14 @@ main = function()
 
 	
 
-	Noti('SFA - успешно загружен!')
+	Noti('sfa - успешно загружен!')
 	-- timer('update', 1, function ()
 	-- 	update()
 	-- end)
 
-	if cfg.debug then
-		local path = script.this.path
-		local f = io.open(path, 'r')
-		local sfa_content = f:read('*a')
-		f:close()
-	
-		local f = io.open(getWorkingDirectory().. '\\lib\\sfa\\zSFA2.lua', 'w')
-		f:write(sfa_content)
-		f:close()
-	end
-	
-	
-	while true do
 
 
-        wait(0)
-    end
+	wait(-1)
 end
 
 
