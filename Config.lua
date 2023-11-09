@@ -264,7 +264,7 @@ local json = function(orig_t, save_name)
 		f = io.open(getWorkingDirectory() .. save_name, 'w')
 		-- assert(f)
 
-		local t = ((not save_orig) or (not f)) and loaded_table or orig_t
+		local t = (save_orig) and loaded_table or orig_t
 		f:write(encodeJson(t))
 		f:close()
 		--	Noti('SVAE '..(table and 'savedt' or 'orig_t'))
