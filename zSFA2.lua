@@ -85,7 +85,7 @@ ProcessLog = {
 Loaded_Icons = {"arrow_left", 'ARROWS_ROTATE', "TRASH", "ARROW_DOWN", "ARROW_UP", "GEAR", "MAGNIFYING_GLASS"}
 
 
-cfg = require('sfa.Config')(sfa_settings,  "\\sfa\\settings.json")
+cfg = require('sfa.Config')(SFA_settings,  "\\sfa\\settings.json")
 
 if cfg.debug then
 	local path = script.this.path
