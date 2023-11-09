@@ -26,16 +26,6 @@ local list = {
 }
 
 
-local function getFilesInPath(path, ftype)
-	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
-	table.insert(Files, File)
-	while File do
-		File = findNextFile(SearchHandle)
-		table.insert(Files, File)
-	end
-	return Files
-end
-
 for k, v in ipairs{"визуал", "прочее", "автоматизация", 'необходимое'} do
 	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\lib\\sfa\\select\\settings\\" .. v, '*.lua')) do
 		table.insert(list[k], require('sfa.select.settings.' .. v .. '.' .. v2:gsub("%.lua", "")))
