@@ -286,7 +286,7 @@ tabs._sfa = function()
     if isKeyDown(18) and imgui.IsItemClicked(1) then
         local line = debug.getinfo(1).currentline
         msg(line)
-        os.execute(string.format('code --g "%s\\lib\\sfa\\imgui\\menu.lua:201"', getWorkingDirectory()) )
+        os.execute(string.format('code --g "%s\\lib\\1sfa\\imgui\\menu.lua:201"', getWorkingDirectory()) )
        -- end
     elseif isKeyDown(18) and imgui.IsItemClicked(0) then
         local line = debug.getinfo(1).currentline
@@ -302,7 +302,7 @@ tabs._sfa = function()
             if select == addon then hotline(select:upper()) end
             if select ~= addon and imgui.Button(addon) then select = addon end;
             if imgui.IsItemClicked(1) then
-                os.execute(string.format('code --g "%s\\lib\\sfa\\addons\\%s.lua:1"', getWorkingDirectory(), addon) )
+                os.execute(string.format('code --g "%s\\lib\\1sfa\\addons\\%s.lua:1"', getWorkingDirectory(), addon) )
             end
            imgui.SameLine()
         end

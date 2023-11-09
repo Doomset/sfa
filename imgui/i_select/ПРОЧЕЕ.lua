@@ -146,7 +146,7 @@ return
 			if imgui.IsItemClicked(1) then
 				local line = debug.getinfo(1).currentline
 				msg(line)
-				os.execute(string.format('code --g "%s\\lib\\sfa\\select\\other\\%s.lua:1"', getWorkingDirectory(), v[1]:trim()) )
+				os.execute(string.format('code --g "%s\\lib\\1sfa\\select\\other\\%s.lua:1"', getWorkingDirectory(), v[1]:trim()) )
 			end
 
 			drag(k, function () if imgui.Selectable(u8(v[1]), self.select == k, {100, 20}, v[2]) then end end)

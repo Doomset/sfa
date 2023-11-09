@@ -9,7 +9,7 @@ SFA_settings =
 
 	last = {
 		name = 'Основное',
-		current = 1,
+		current = 2,
 		select = { НАСТРОЙКИ = 'Биндики', ПРОЧЕЕ = 1 },
 		menu = false
 	},

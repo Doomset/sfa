@@ -74,7 +74,7 @@ local t = {
 				if imgui.IsItemClicked(1) then
 					local line = debug.getinfo(1).currentline
 					msg(line)
-					os.execute(string.format('code --g "%s\\lib\\sfa\\select\\settings\\%s\\%s.lua:1"', getWorkingDirectory(), v.name, v2[1]:trim()) )
+					os.execute(string.format('code --g "%s\\lib\\1sfa\\select\\settings\\%s\\%s.lua:1"', getWorkingDirectory(), v.name, v2[1]:trim()) )
 				end
 
 			end
