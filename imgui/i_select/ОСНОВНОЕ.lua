@@ -44,7 +44,7 @@ end
 
 
 for i = 1, 3, 1 do -- если нет в конфиге элемента - добавляется из файла
-	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\lib\\sfa\\select\\" .. list[i].name, '*.lua')) do
+	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\sfa\\select\\" .. list[i].name, '*.lua')) do
 		v2 = v2:gsub('%.lua', '')
 		if not find(v2) then
 			require_function(i, #list[i].name + 1, list[i].name, v2)

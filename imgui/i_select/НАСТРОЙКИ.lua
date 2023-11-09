@@ -27,7 +27,7 @@ local list = {
 
 
 for k, v in ipairs{"визуал", "прочее", "автоматизация", 'необходимое'} do
-	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\lib\\sfa\\select\\settings\\" .. v, '*.lua')) do
+	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\sfa\\select\\settings\\" .. v, '*.lua')) do
 		table.insert(list[k], require('sfa.select.settings.' .. v .. '.' .. v2:gsub("%.lua", "")))
 	end
 end
