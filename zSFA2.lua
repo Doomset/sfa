@@ -33,7 +33,7 @@ end
 
 local count_init = 0
 require = function(n)
-	n = n:gsub('sfa', '1sfa')
+	-- = n:gsub('sfa', '1sfa')
 	local name = _require(n)
 
 	local con, log = table.concat, trace
@@ -627,7 +627,7 @@ end
 
 local upd = function (self)
 	lua_thread.create(function ()
-		local new_git, old_git = self.download_git()
+		local new_git, old_git = update.download_git()
 
 		if not new_git then Noti("Íå óäàëîñü ïîëó÷èòü äàííûå\nÑñûëêà äëÿ ñêà÷êè áûëà ñêîïèğîâàíà â áóôåğ îáìåíà", ERROR) return end
 
@@ -638,7 +638,7 @@ local upd = function (self)
 		
 
 		if #upd > 0 then
-			self.download(upd)
+			update.download(upd)
 		else
 			Noti('Âñå àõóåííà', OK)
 		end
@@ -646,49 +646,47 @@ local upd = function (self)
 end
 sampRegisterChatCommand('upd', upd)
 
-local imgui = require('mimgui')
-update.gui = function (self)
-	imgui.Begin('download_manage')
-	if imgui.Button('Download git') then
-		lua_thread.create(function ()
-			local res, d = self.download_git()
-			Noti(res and 'ÑÊÀ×ÀÍ ÔÀÉË' or 'ÍÅ ÓÄÀËÎÑÜ ÑÊÀ×ÀÒÜ', res and OK or ERROR) 
-		end)
-	end
+-- local imgui = require('mimgui')
+-- update.gui = function (self)
+-- 	imgui.Begin('download_manage')
+-- 	if imgui.Button('Download git') then
+-- 		lua_thread.create(function ()
+-- 			local res, d = self.download_git()
+-- 			Noti(res and 'ÑÊÀ×ÀÍ ÔÀÉË' or 'ÍÅ ÓÄÀËÎÑÜ ÑÊÀ×ÀÒÜ', res and OK or ERROR) 
+-- 		end)
+-- 	end
 
-	if imgui.Button('Redownload files') then
-		lua_thread.create(function ()
-			local res = self.download_git()
+-- 	if imgui.Button('Redownload files') then
+-- 		lua_thread.create(function ()
+-- 			local res = self.download_git()
 			
-			if res then
-				Noti('OK'..res[#res].path, OK)
+-- 			if res then
+-- 				Noti('OK'..res[#res].path, OK)
 
-				if self.download(res) then
-					progress_download.text = 'end'
-				end
+-- 				if self.download(res) then
+-- 					progress_download.text = 'end'
+-- 				end
 
-			else
-				Noti('SOsni ', ERROR)
-			end
--- =--Noti(res and 'ÑÊÀ×ÀÍ ÔÀÉË' or 'ÍÅ ÓÄÀËÎÑÜ ÑÊÀ×ÀÒÜ', res and OK or ERROR) 
-		end)
+-- 			else
+-- 				Noti('SOsni ', ERROR)
+-- 			end
+-- -- =--Noti(res and 'ÑÊÀ×ÀÍ ÔÀÉË' or 'ÍÅ ÓÄÀËÎÑÜ ÑÊÀ×ÀÒÜ', res and OK or ERROR) 
+-- 		end)
 
 
-	end
+-- 	end
 
-	if imgui.Button('checkupds') then
+-- 	if imgui.Button('checkupds') then
 		
-		upd(self)
+-- 		upd(self)
 
-	end
+-- 	end
 
-	imgui.Text(u8(progress_download.text))
-	imgui.ProgressBar(progress_download.current / progress_download.start, {100, 20})
+-- 	imgui.Text(u8(progress_download.text))
+-- 	imgui.ProgressBar(progress_download.current / progress_download.start, {100, 20})
 
-	imgui.End()
-end
-
-
+-- 	imgui.End()
+-- end
 
 
 
@@ -708,10 +706,12 @@ end
 
 
 
-imgui.OnFrame(function() return 1 end,
-function ()
-	update:gui()
-end)
+
+
+-- imgui.OnFrame(function() return 1 end,
+-- function ()
+-- 	update:gui()
+-- end)
 
 
 

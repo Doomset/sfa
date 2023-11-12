@@ -106,7 +106,7 @@ local list =
                     if sovp == savp2 then
                         local res, reason = pcall(load_string(v.func))
                         if reason then Noti(reason, INFO) end
-                        Noti(v.name, INFO)
+                        --Noti(v.name, INFO)
                         hot_list = self.dick;
                         br = true
                         break;
