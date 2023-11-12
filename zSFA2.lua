@@ -542,8 +542,6 @@ update.download = function (files)
 					progress_download.text = 'бяе тюикш яйювюмш сяоеьмн'
 					Noti('бяе тюикш яйювюмш сяоеьмн')
 				end
-
-
 				return
 			end
 		end
