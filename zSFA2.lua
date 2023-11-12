@@ -357,18 +357,18 @@ local rename = function (mode, git_path)
 
 	if mode and  doesFileExist(p) then
 		os.rename(p, git_path)
-		Noti('Вернул оригинальное название')
+	--	Noti('Вернул оригинальное название')
 		return p
 	end
 
 	if doesFileExist(p)  then
-		Noti('Удалил старый файл')
+		--Noti('Удалил старый файл')
 		os.remove(p)
 	end
 
 
 	if not doesFileExist(git_path) then return end
-	Noti('Переминовал старый файл')
+	--Noti('Переминовал старый файл')
 	os.rename(git_path, p)
 end
 
@@ -455,7 +455,7 @@ update.download_git = function ()
 
 	while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(0) end
 
-	return downlanded_git.tree, old_git.tree
+	return downlanded_git.tree, old_git
 
 end
 
@@ -540,8 +540,12 @@ update.download = function (files)
 				if k == #files or #files == 0 then
 					download_result = true
 					progress_download.text = 'ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
-					Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО')
+					Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО, перезагурзка')
+					lua_thread.create(function ()
+						wait(500)
 					thisScript():reload()
+					end)
+					
 				end
 
 
@@ -608,7 +612,7 @@ local verify_files = function (git_data, oldgit_data)
 		elseif (not exist_file) then
 			print('файла не существует! '..v.path)
 			table.insert(files, {path = v.path, size = v.size, update = false})
-		elseif oldgit_data and check_hash(v.path, v.sha, oldgit_data) then
+		elseif oldgit_data and check_hash(v.path, v.sha, oldgit_data.tree) then
 			print('обнаржуен опдейт! '..v.path)
 			table.insert(files, {path = v.path, size = v.size, update = true})
 		end
@@ -625,7 +629,7 @@ local upd = function (self)
 	lua_thread.create(function ()
 		local new_git, old_git = self.download_git()
 
-		if not new_git or not old_git then Noti("Не удалось получить данные\nСсылка для скачки была скопирована в буфер обмена", ERROR) return end
+		if not new_git then Noti("Не удалось получить данные\nСсылка для скачки была скопирована в буфер обмена", ERROR) return end
 
 
 
