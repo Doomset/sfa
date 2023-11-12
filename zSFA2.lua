@@ -344,9 +344,10 @@ end
 
 local directory = function (dir)
 	dir = dir:gsub('/', '\\')
-	if doesDirectoryExist(dir) then return end
+	if doesDirectoryExist(dir) then return false end
 	local res = createDirectory(dir)
-	Noti('Папки не существует - создание '..dir, res and OK or ERROR)
+	print('Папки не существует - создание '..dir, res and OK or ERROR)
+	return true
 end
 
 
@@ -387,7 +388,7 @@ end
 
 
 local check_hash = function(name, hash, git)-- сравнение кеша из старых файлах в новых
-	for _, v in ipairs(git.tree) do
+	for _, v in ipairs(git) do
 		if v.path == name and v.sha ~= hash and v.type ~= 'tree' then print('Обнаружено обновление ! '..name) return true end
 	end
 	return false
@@ -413,34 +414,7 @@ local download_thread = nil
 
 
 
-local verify_files = function (git_data, oldgit_data)
 
-	if not git_data then return end
-
-	local result = true
-	for _, v in ipairs(git_data.tree) do
-		local p = getWorkingDirectory()..'\\sfa\\'..v.path
-		local exist_file = doesFileExist(p)
-		if v.type == 'tree' then
-			directory(p)
-		elseif (not exist_file) and no_need_download(v.path) then
-			print('файла не существует! '..v.path)
-			table.insert(files, {path = v.path, size = v.size, update = false})
-			result = false
-		elseif oldgit_data and no_need_download(v.path) and check_hash(v.path, v.sha, oldgit_data) then
-			
-			table.insert(files, {path = v.path, size = v.size, update = true})
-		end
-		
-	end
-
-	local text = result and 'Все файлы прошли проверку' or  "Файлов не прошедших проверку "..#files
-	Noti(text, result and OK or ERROR)
-
-	if result then finish() end
-
-	return result
-end
 
 
 
@@ -456,9 +430,7 @@ update.download_git = function ()
 		Noti('Вернул оригинальное название')
 	end
 
-
 	local old_git, old_git_file = read_file(git_path) -- старый прочитан
-
 
 	rename(false, git_path)	
 	
@@ -469,56 +441,21 @@ update.download_git = function ()
 		if status == dlstatus.STATUSEX_ENDDOWNLOAD then
 			-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
 			downlanded_git = read_file(git_path) -- скачан новый
-			Noti(#downlanded_git)
 
 			if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
-				Noti('Ne skach')
 				rename(1, git_path) -- вернуть наw
-	
 				downlanded_git = false
-				-- Noti("Не удалось получить новые данные\nСсылка для скачки была скопирована в буфер обмена", ERROR)
-				-- if old_git then
-				-- 	Noti('Запущена проверка целостности')
-				-- 	verify_files(old_git)
-				-- 	status_text = text
-				-- else finish() end
 				return false, 'sosni'
 			end
 			
 			os.remove(git_path:gsub('data', 'old'))
-
-
-			
-			cfg.req_limit = cfg.req_limit + 1
-			cfg()
-
-
-		
-
-			Noti('Число запрососв '..cfg.req_limit)
-
-			-- if old_git then -- если старый файл существует
-			-- 	if (old_git.sha == downlanded_git.sha) then -- проверяем хеши закачаного и старого
-			-- 		Noti('Обновления не требуются', OK)
-			-- 		Noti('Запущена проверка целостности')
-			-- 		local is_ok = verify_files(downlanded_git) -- верификация файлов
-			-- 	else
-			-- 		Noti('Обнаружен апдейт', INFO)
-			-- 		verify_files(downlanded_git, old_git) -- хеш конфигов не совппадает, проверка на обновление файлов
-			-- 	end
-			
-			-- else  -- старого файла не существует, проверка наличие файлов в новом!
-			-- 	Noti('Старый гит не был найден\nначал проверку на наличие файлов в закачаном')
-			-- 	verify_files(downlanded_git)
-			-- end
-
 		end
 	end)
 
 
 	while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(0) end
 
-	return downlanded_git.tree, old_git
+	return downlanded_git.tree, old_git.tree
 
 end
 
@@ -565,14 +502,27 @@ end
 
 
 local progress_download = {
+	process = false,
 	text = '',
-	start = -1,
-	current = -1
+	start = 0,
+	current = 0,
 }
 
+-- addEventHandler('onScriptTerminate', function(LuaScript, quitGame)
+-- 	if LuaScript == thisScript() then
+-- 		if progress_download.process then
+-- 			progress_download.process = false
+-- 		end
+-- 		rename(1, git_path)
+-- 	end
+-- end)
 
 
 update.download = function (files)
+
+
+		
+
 
 	progress_download.start = #files
 
@@ -580,64 +530,53 @@ update.download = function (files)
 
 	local download_result
 
-	local d = function ()
-		table.remove(files, #files)
-		progress_download.current = progress_download.current + 1
-		Noti(#files)
+	local d = function (name)
+		for k, v in ipairs(files) do
+			if v.path == name then
+				
+				table.remove(files, k)
+				progress_download.current = progress_download.current + 1
 
-	--	Noti(text..' '..#for_download..' '..index, INFO)
-		if #files ==  0 then
-			download_result = true
-			progress_download.text = 'ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
+				if k == #files then
+					download_result = true
+					progress_download.text = 'ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
+					Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО')
+				end
 
-			Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
-		)
 
-			-- local is_ok = verify_files(downlanded_git)
-			-- status_text = 'Все'
-			--finish()
-		end
-	end
-
-	for _, v in ipairs(files) do
-
-		if v.type == 'tree' then
-			directory(getWorkingDirectory()..'\\sfa\\'..v.path)
-			d()
-		else
-
-			local url = 'https://raw.githubusercontent.com/doomset/sfa/main/'..url_encode(u8(v.path))
-
-			local moonDir = getWorkingDirectory()
-			local path = v.path:find('zsfa2') and moonDir..'\\zsfa2.lua' or (moonDir.. '\\sfa\\'..v.path)
-			
-			local downlaod = function (text, update)
-				downloadUrlToFile(url, path,
-				function(id, status, p1, p2)
-					process_update = true
-
-					progress_download.text = (update and 'обновляю ' or 'качаю ')..v.path
-
-					if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-
-						if not doesFileExist(path) then Noti('chto to poshlo ne tak'..path, ERROR) download_result = false return false end
-
-						progress_download.text = (update and 'обновлен ' or 'скачан ')..v.path
-
-					
-
-						d()
-						
-						
-					end
-				end)
+				return
 			end
-			downlaod('Downloaded! '..v.path, v.update)
 		end
+
+
+		
 	end
 
-	while download_result == nil do wait(0) end
+	for _i, v in ipairs(files) do
 
+		local url = 'https://raw.githubusercontent.com/doomset/sfa/main/'..url_encode(u8(v.path))
+		local moonDir = getWorkingDirectory()
+		local path =  (moonDir.. '\\sfa\\'..v.path) --v.path:find('3z3sfa2') and moonDir..'\\zsfa2.lua' or 
+
+		--if not path:find('%.git') then
+		--print(status, v.path)
+		downloadUrlToFile(url, path,
+		function(id, status, p1, p2)
+			process_update = true
+			progress_download.text = (v.update and 'обновляю ' or 'качаю ')..v.path
+			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+                progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
+				d(v.path)
+			end
+		end)
+		
+			
+		
+	end
+
+	while download_result == nil do wait(10) end
+
+	
 
 	return download_result
 end
@@ -650,7 +589,36 @@ setmetatable(update, {
 })
 
 
+-- for index, v in ipairs(files) do
+-- 	if v.type == 'tree' then
+-- 		directory(getWorkingDirectory()..'\\sfa\\'..v.path)
+-- 		table.remove(files, index)
+-- 	end
+-- end
 
+local verify_files = function (git_data, oldgit_data)
+	local files = {}
+	for _, v in ipairs(git_data) do
+		
+		local p = getWorkingDirectory()..'\\sfa\\'..v.path
+		local exist_file = doesFileExist(p)
+		if v.type == 'tree' then
+			directory(getWorkingDirectory()..'\\sfa\\'..v.path)
+		elseif (not exist_file) then
+			print('файла не существует! '..v.path)
+			table.insert(files, {path = v.path, size = v.size, update = false})
+		elseif oldgit_data and check_hash(v.path, v.sha, oldgit_data) then
+			print('обнаржуен опдейт! '..v.path)
+			table.insert(files, {path = v.path, size = v.size, update = true})
+		end
+		
+		
+	end
+	-- local text = result and 'Все файлы прошли проверку' or  "Файлов не прошедших проверку "..#files
+	-- Noti(text, result and OK or ERROR)
+
+	return files
+end
 
 sampRegisterChatCommand('upd', update.start)
 
@@ -667,13 +635,40 @@ update.gui = function (self)
 	if imgui.Button('Redownload files') then
 		lua_thread.create(function ()
 			local res = self.download_git()
+			
 			if res then
-				print(#res)
-				self.download(res)
+				Noti('OK'..res[#res].path, OK)
+
+				if self.download(res) then
+					progress_download.text = 'end'
+				end
+
 			else
 				Noti('SOsni ', ERROR)
 			end
 -- =--Noti(res and 'СКАЧАН ФАЙЛ' or 'НЕ УДАЛОСЬ СКАЧАТЬ', res and OK or ERROR) 
+		end)
+
+
+	end
+
+	if imgui.Button('checkupds') then
+		lua_thread.create(function ()
+			local new_git, old_git = self.download_git()
+
+			if not new_git or not old_git then Noti("Не удалось получить данные\nСсылка для скачки была скопирована в буфер обмена", ERROR) return end
+
+
+
+			local upd = verify_files(new_git, old_git)
+
+			
+
+			if #upd > 0 then
+				self.download(upd)
+			else
+				Noti('Все ахуенна', OK)
+			end
 		end)
 
 
@@ -716,11 +711,7 @@ end)
 
 
 
-addEventHandler('onScriptTerminate', function(LuaScript, quitGame)
-	if LuaScript == thisScript() then
-		rename(1, git_path)
-	end
-end)
+
 
 
 main = function()
