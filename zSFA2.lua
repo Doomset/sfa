@@ -537,11 +537,14 @@ update.download = function (files)
 				table.remove(files, k)
 				progress_download.current = progress_download.current + 1
 
-				if k == #files then
+				if k == #files or #files == 0 then
 					download_result = true
 					progress_download.text = 'ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
 					Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО')
+					thisScript():reload()
 				end
+
+
 				return
 			end
 		end
@@ -618,7 +621,26 @@ local verify_files = function (git_data, oldgit_data)
 	return files
 end
 
-sampRegisterChatCommand('upd', update.start)
+local upd = function (self)
+	lua_thread.create(function ()
+		local new_git, old_git = self.download_git()
+
+		if not new_git or not old_git then Noti("Не удалось получить данные\nСсылка для скачки была скопирована в буфер обмена", ERROR) return end
+
+
+
+		local upd = verify_files(new_git, old_git)
+
+		
+
+		if #upd > 0 then
+			self.download(upd)
+		else
+			Noti('Все ахуенна', OK)
+		end
+	end)
+end
+sampRegisterChatCommand('upd', upd)
 
 local imgui = require('mimgui')
 update.gui = function (self)
@@ -651,24 +673,8 @@ update.gui = function (self)
 	end
 
 	if imgui.Button('checkupds') then
-		lua_thread.create(function ()
-			local new_git, old_git = self.download_git()
-
-			if not new_git or not old_git then Noti("Не удалось получить данные\nСсылка для скачки была скопирована в буфер обмена", ERROR) return end
-
-
-
-			local upd = verify_files(new_git, old_git)
-
-			
-
-			if #upd > 0 then
-				self.download(upd)
-			else
-				Noti('Все ахуенна', OK)
-			end
-		end)
-
+		
+		upd(self)
 
 	end
 
