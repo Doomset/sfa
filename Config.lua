@@ -1,6 +1,7 @@
 SFA_settings =
 {
 
+	build = '',
 	autoupdate = false,
 	piska = 1,
 	req_limit = 0,
@@ -44,67 +45,62 @@ SFA_settings =
 
 
 
-	["Биндики"] = {
+	["Бинды"] =
+	{
+		que = {"Меню", "Команды", 'Всякя залупа'},
 
-		["Список"] = {
 
-			{ name = "Меню", keys = { "1" }, func = [[menu.switch()]], on = true },
-
-			{ name = "Пангит - Нитро", keys = nil, func = [[ Пангит(7) ]], on = false },
-
-			{ name = "Инвентарь - Ремнабор", keys = nil, func = [[ Инвентарь(13) ]], on = false },
-
-			{ name = "/гараж", keys = nil, func = [[ dops = true sampSendChat("/гараж") ]], on = false },
-
-			{ name = "/дом - выйти", keys = nil, func = [[ Дом(11) ]], on = false },
-
-			{ name = "/дом - сейф", keys = { "1", "2", "3" }, func = [[ Дом(5) ]], on = false },
-
-			{ name = "Мутация - Ступор", keys = nil, func = [[ Мутация(5) ]], on = false },
-
-			{ name = "Мутация - Сумрак", keys = nil, func = [[ Мутация(4) ]], on = false },
-
-			{ name = "Мутация - Пси", keys = nil, func = [[ Мутация(6) ]], on = false },
-
-			{ name = "/cтелс", keys = nil, func = [[ sampSendChat("/стелс") ]], on = false },
-
-			{ name = "Инвентарь - Аптечка", keys = nil, func = [[ Инвентарь(7) ]], on = false },
-
+		list =
+		{
 			{
-				name = "Пангит - миниган",
-				keys = nil,
-				func = [[ Пангит(8) sampSendChat("/пангит") ]],
-				on = false
+				{ name = "Меню", keys = { "1" }, func = [[menu.switch()]], on = true },
+			},
+			{
+				{ name = "/cтелс", keys = nil, func = [[ sampSendChat("/стелс") ]], on = false },
+				{ name = "/дом - выйти", keys = nil, func = [[ Дом(11) ]], on = false },
+				{ name = "/дом - сейф", keys = { "1", "2", "3" }, func = [[ Дом(5) ]], on = false },
+				{ name = "/гараж", keys = nil, func = [[ dops = true sampSendChat("/гараж") ]], on = false },
+
+				{ name = "Инвентарь - Аптечка", keys = nil, func = [[ Инвентарь(7) ]], on = false },
+				{ name = "Инвентарь - Ремнабор", keys = nil, func = [[ Инвентарь(13) ]], on = false },
+				{ name = "Инвентарь - Винт", keys = nil, func = [[ Инвентарь(12) ]], on = false },
+				{ name = "Инвентарь - Арт", keys = nil, func = [[ Инвентарь(17) ]], on = false },
+
+				{ name = "Пангит - миниган", keys = nil, func = [[Пангит(8)]], on = false},
+
+				{ name = "Пангит - джетпак", keys = nil, func = [[ Пангит(9) ]], on = false },
+
+				{ name = "Пангит - Нитро", keys = nil, func = [[ Пангит(7) ]], on = false },
+
+				
+
+				{ name = "Мутация - снорк", keys = nil, func = [[ Мутация(2) ]], on = false },
+				{ name = "Мутация - бегун", keys = nil, func = [[ Мутация(3) ]], on = false },
+				{ name = "Мутация - Ступор", keys = nil, func = [[ Мутация(5) ]], on = false },
+
+				{ name = "Мутация - Сумрак", keys = nil, func = [[ Мутация(4) ]], on = false },
+
+				{ name = "Мутация - Пси", keys = nil, func = [[ Мутация(6) ]], on = false },
+
+				{ name = "/дрон", keys = nil, func = [[ sampSendChat("/дрон") ]], on = false },
+
+				{ name = "/джетпак", keys = nil, func = [[ sampSendChat("/джетпак") ]], on = false },
+
 			},
 
-			{ name = "Пангит - джетпак", keys = nil, func = [[ Пангит(9) ]], on = false },
-
-			{ name = "Инвентарь - Винт", keys = nil, func = [[ Инвентарь(12) ]], on = false },
-
-			{ name = "Мутация - снорк", keys = nil, func = [[ Мутация(2) ]], on = false },
-
-			{ name = "/дрон", keys = nil, func = [[ sampSendChat("/дрон") ]], on = false },
-
-			{ name = "/джетпак", keys = nil, func = [[ sampSendChat("/джетпак") ]], on = false },
+			
 
 			{
-				name = "Чат",
-				keys = { "K" },
-				func = [[ sampSetChatInputText("/kk ") sampSetChatInputEnabled(true) ]],
-				on = true
-			},
+				
 
-			{ name = "Мутация - бегун", keys = nil, func = [[ Мутация(3) ]], on = false },
-
-			{ name = "Инвентарь - Арт", keys = nil, func = [[ Инвентарь(17) ]], on = false },
-
-			{
-				name = "Тп",
-				keys = { "2" },
-				func = [[ require('sfa.select.Основное.Телепорт по метке').func() ]],
-				on = false
+				{name = "Чат",keys = { "K" },func = [[ sampSetChatInputText("/kk ") sampSetChatInputEnabled(true) ]],on = true},
+				
+				{name = "Тп",keys = { "2" },func = [[ require('sfa.select.Основное.Телепорт по метке').func() ]],on = false},
 			},
 		},
+
+			
+	
 	},
 
 	["Блок пикапов"] = {
@@ -262,13 +258,13 @@ local json = function(orig_t, save_name)
 
 	local save = function(save_orig)
 		f = io.open(getWorkingDirectory() .. save_name, 'w')
-		-- assert(f)
+		assert(f, 'che za gavno')
 
-		local t = (save_orig) and loaded_table or orig_t
-		f:write(encodeJson(t))
+		loaded_table = (save_orig) and orig_t or  loaded_table
+		f:write(encodeJson(loaded_table))
 		f:close()
 		--	Noti('SVAE '..(table and 'savedt' or 'orig_t'))
-		return t
+		return loaded_table
 	end
 
 	local load = function()
@@ -279,6 +275,8 @@ local json = function(orig_t, save_name)
 		end
 		loaded_table = decodeJson(f:read('*a'))
 		f:close()
+		if loaded_table == nil then print('Таблица повреждена, пересоздание') return save(true) end
+
 		return loaded_table
 	end
 
@@ -287,22 +285,16 @@ local json = function(orig_t, save_name)
 
 		__index = function(self, k)
 			if not rawget(self, k) then
-				msg(k, 'ключ не был найден в загруженных найстройках')
+				print(k, 'ключ не был найден в загруженных найстройках')
 
 				if rawget(orig_t, k) then
-					msg(k, 'но был найден в дефолтной таблице')
+					print(k, 'но был найден в дефолтной таблице')
 					rawset(self, k, orig_t[k])
 					save()
 				end
 			end
 		end,
 
-		__newindex = function(t, k, v)
-			rawset(t, k, v)
-			save()
-
-			sampAddChatMessage("ДОБАВЛЕН НОВЫЙ КЛЮЧ В ТАБЛИЦУ, ФАЙЛ СОХРАНЕН")
-		end
 	})
 end
 

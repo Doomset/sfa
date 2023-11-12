@@ -24,9 +24,16 @@ addConsole = function(...)
 end
 
 
+
+
+
+
+
+
+
 local count_init = 0
 require = function(n)
-	--n = n:gsub('sfa', 'test_sfa')
+	n = n:gsub('sfa', '1sfa')
 	local name = _require(n)
 
 	local con, log = table.concat, trace
@@ -37,6 +44,12 @@ require = function(n)
 	--print(_M[name])
 	return name
 end
+
+
+cfg = require('sfa.Config')(SFA_settings,  "\\sfa\\settings.json")
+
+
+
 
 function getFilesInPath(path, ftype)
 	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
@@ -85,13 +98,16 @@ ProcessLog = {
 Loaded_Icons = {"arrow_left", 'ARROWS_ROTATE', "TRASH", "ARROW_DOWN", "ARROW_UP", "GEAR", "MAGNIFYING_GLASS"}
 
 
-cfg = require('sfa.Config')(SFA_settings,  "\\sfa\\settings.json")
+
 
 if cfg.debug then
 	local path = script.this.path
 	local f = io.open(path, 'r')
 	local sfa_content = f:read('*a')
 	f:close()
+
+	cfg.build = os.date("%d.%m.%Y(%H:%M:%S)")
+	cfg()
 
 	local f = io.open(getWorkingDirectory().. '\\lib\\1sfa\\zsfa2.lua', 'w')
 	f:write(sfa_content)
@@ -104,15 +120,7 @@ require 'sfa.samp'
 require('sfa.imgui.onInitialize')
 require("sfa.timer")
 
-Pickup = function(pickup_name)
-	for _, v in pairs(cfg.Пикапы) do
-		
-		if v.name:lower():find(pickup_name:lower()) then
-			return v.id
-		end
-	end
-	return false
-end
+
 
 
 
@@ -371,6 +379,7 @@ local read_file = function (file)
 	if not f then return false end
 	local file = u8:decode(f:read('*a'))
 	f:close()
+
 	local table = decodeJson(file)
 	return table, file
 end
@@ -388,10 +397,10 @@ end
 
 local dlstatus = require('moonloader').download_status
 
-local for_download
+local files
 local process_update
 local abort_update = false
-local status_text = 'dddd'
+-- /local progress_download.text = 'dddd'
 
 local git_path = getWorkingDirectory()..'\\sfa\\data.json'
 
@@ -399,24 +408,137 @@ local file_count = 0
 
 
 
-local update_thread = nil
-
-local update = function ()
-
-	if update_thread ~= nil and not update_thread.dead then Noti('На данный момент идет проверка') return false end
+local download_thread = nil
 
 
+
+
+local verify_files = function (git_data, oldgit_data)
+
+	if not git_data then return end
+
+	local result = true
+	for _, v in ipairs(git_data.tree) do
+		local p = getWorkingDirectory()..'\\sfa\\'..v.path
+		local exist_file = doesFileExist(p)
+		if v.type == 'tree' then
+			directory(p)
+		elseif (not exist_file) and no_need_download(v.path) then
+			print('файла не существует! '..v.path)
+			table.insert(files, {path = v.path, size = v.size, update = false})
+			result = false
+		elseif oldgit_data and no_need_download(v.path) and check_hash(v.path, v.sha, oldgit_data) then
+			
+			table.insert(files, {path = v.path, size = v.size, update = true})
+		end
+		
+	end
+
+	local text = result and 'Все файлы прошли проверку' or  "Файлов не прошедших проверку "..#files
+	Noti(text, result and OK or ERROR)
+
+	if result then finish() end
+
+	return result
+end
+
+
+
+update = {}
+
+
+
+
+update.download_git = function ()
+	local p = git_path:gsub('data', 'old')
+	if doesFileExist(p) then
+		os.rename(p, git_path)
+		Noti('Вернул оригинальное название')
+	end
+
+
+	local old_git, old_git_file = read_file(git_path) -- старый прочитан
+
+
+	rename(false, git_path)	
 	
+	local downlanded_git, status_text = nil, 'загрузка конфига'
 
-	update_thread = lua_thread.create(function ()
+	local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursive=1" -- закачка нового гита
+	downloadUrlToFile(url_git, git_path, function(id, status)
+		if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+			-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
+			downlanded_git = read_file(git_path) -- скачан новый
+			Noti(#downlanded_git)
 
+			if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
+				Noti('Ne skach')
+				rename(1, git_path) -- вернуть наw
 	
+				downlanded_git = false
+				-- Noti("Не удалось получить новые данные\nСсылка для скачки была скопирована в буфер обмена", ERROR)
+				-- if old_git then
+				-- 	Noti('Запущена проверка целостности')
+				-- 	verify_files(old_git)
+				-- 	status_text = text
+				-- else finish() end
+				return false, 'sosni'
+			end
+			
+			os.remove(git_path:gsub('data', 'old'))
+
+
+			
+			cfg.req_limit = cfg.req_limit + 1
+			cfg()
+
+
+		
+
+			Noti('Число запрососв '..cfg.req_limit)
+
+			-- if old_git then -- если старый файл существует
+			-- 	if (old_git.sha == downlanded_git.sha) then -- проверяем хеши закачаного и старого
+			-- 		Noti('Обновления не требуются', OK)
+			-- 		Noti('Запущена проверка целостности')
+			-- 		local is_ok = verify_files(downlanded_git) -- верификация файлов
+			-- 	else
+			-- 		Noti('Обнаружен апдейт', INFO)
+			-- 		verify_files(downlanded_git, old_git) -- хеш конфигов не совппадает, проверка на обновление файлов
+			-- 	end
+			
+			-- else  -- старого файла не существует, проверка наличие файлов в новом!
+			-- 	Noti('Старый гит не был найден\nначал проверку на наличие файлов в закачаном')
+			-- 	verify_files(downlanded_git)
+			-- end
+
+		end
+	end)
+
+
+	while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(0) end
+
+	return downlanded_git.tree, old_git
+
+end
+
+
+
+
+
+
+
+
+
+update.start = function (self)
+	
+	if download_thread ~= nil and not download_thread.dead then Noti('На данный момент идет проверка') return false end
 		Noti('Вызвана')
 			
 		process_update = nil
 
 		abort_update = false
-		for_download = nil
+		files = nil
 		
 		file_count = 0
 		directory(getWorkingDirectory()..'\\sfa')
@@ -427,129 +549,63 @@ local update = function ()
 		end	
 		
 
-		for_download = {} -- таблица для скачки
+		--files = {} -- таблица для скачки
 		
 
 		local finish = function ()
-			update_thread:terminate()
-			update_thread = nil
+			download_thread:terminate()
+			download_thread = nil
 		end
 
 
+		self.download_git()
 
-		local verify_files = function (git_data, oldgit_data)
+		if #files == 0 then progress_download.text = 'Обновления не требуются' return false end
+end
 
-			if not git_data then return end
 
-			local result = true
-			for _, v in ipairs(git_data.tree) do
-				local p = getWorkingDirectory()..'\\sfa\\'..v.path
-				local exist_file = doesFileExist(p)
-				if v.type == 'tree' then
-					directory(p)
-				elseif (not exist_file) and no_need_download(v.path) then
-					print('файла не существует! '..v.path)
-					table.insert(for_download, {path = v.path, size = v.size, update = false})
-					result = false
-				elseif oldgit_data and no_need_download(v.path) and check_hash(v.path, v.sha, oldgit_data) then
-					
-					table.insert(for_download, {path = v.path, size = v.size, update = true})
-				end
-				
-			end
+local progress_download = {
+	text = '',
+	start = -1,
+	current = -1
+}
 
-			local text = result and 'Все файлы прошли проверку' or  "Файлов не прошедших проверку "..#for_download
-			Noti(text, result and OK or ERROR)
 
-			if result then finish() end
 
-			return result
+update.download = function (files)
+
+	progress_download.start = #files
+
+	Noti('Будет скачено файлво '..#files or 0)
+
+	local download_result
+
+	local d = function ()
+		table.remove(files, #files)
+		progress_download.current = progress_download.current + 1
+		Noti(#files)
+
+	--	Noti(text..' '..#for_download..' '..index, INFO)
+		if #files ==  0 then
+			download_result = true
+			progress_download.text = 'ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
+
+			Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО'
+		)
+
+			-- local is_ok = verify_files(downlanded_git)
+			-- status_text = 'Все'
+			--finish()
 		end
-		
-	
+	end
 
-		local downlanded_git
-		status_text = 'загрузка конфига'
-		local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursive=1" -- закачка нового гита
+	for _, v in ipairs(files) do
 
-		
-		local p = git_path:gsub('data', 'old')
-		if doesFileExist(p) then
-			os.rename(p, git_path)
-			Noti('Вернул оригинальное название')
-		end
+		if v.type == 'tree' then
+			directory(getWorkingDirectory()..'\\sfa\\'..v.path)
+			d()
+		else
 
-
-		local old_git, old_git_file = read_file(git_path) -- старый прочитан
-
-
-		rename(false, git_path)	
-
-		
-
-		downloadUrlToFile(url_git, git_path, function(id, status)
-			
-			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-				-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
-				downlanded_git = read_file(git_path) -- скачан новый
-
-				if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
-
-					rename(1, git_path) -- вернуть наw
-				
-					Noti("Не удалось получить новые данные\nСсылка для скачки была скопирована в буфер обмена", ERROR)
-			
-
-	
-					if old_git then
-						Noti('Запущена проверка целостности')
-						verify_files(old_git)
-						status_text = text
-					else finish() end
-
-
-
-					return
-				end
-
-
-				os.remove(git_path:gsub('data', 'old'))
-
-				cfg.req_limit = cfg.req_limit + 1
-
-				cfg()
-
-				Noti('Число запрососв '..cfg.req_limit)
-
-				if old_git then -- если старый файл существует
-					if (old_git.sha == downlanded_git.sha) then -- проверяем хеши закачаного и старого
-						Noti('Обновления не требуются', OK)
-						Noti('Запущена проверка целостности')
-						local is_ok = verify_files(downlanded_git) -- верификация файлов
-					else
-						Noti('Обнаружен апдейт', INFO)
-						verify_files(downlanded_git, old_git) -- хеш конфигов не совппадает, проверка на обновление файлов
-					end
-				
-				else  -- старого файла не существует, проверка наличие файлов в новом!
-					Noti('Старый гит не был найден\nначал проверку на наличие файлов в закачаном')
-					verify_files(downlanded_git)
-				end
-
-			end
-		end)
-
-	-- тут происходит закачка всей структуры в свежесозданную папку
-		
-		while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(30) end
-
-
-		if #for_download == 0 then status_text = 'Обновления не требуются' return false end
-
-		dildo = #for_download
-		Noti('Будет скачено файлво '..#for_download or 0)
-
-		for index, v in ipairs(for_download) do
 			local url = 'https://raw.githubusercontent.com/doomset/sfa/main/'..url_encode(u8(v.path))
 
 			local moonDir = getWorkingDirectory()
@@ -559,39 +615,105 @@ local update = function ()
 				downloadUrlToFile(url, path,
 				function(id, status, p1, p2)
 					process_update = true
-					status_text = 'файл качается '..v.path
+
+					progress_download.text = (update and 'обновляю ' or 'качаю ')..v.path
 
 					if status == dlstatus.STATUSEX_ENDDOWNLOAD then
 
-						if not doesFileExist(path) then Noti('chto to poshlo ne tak'..path, ERROR) return false end
+						if not doesFileExist(path) then Noti('chto to poshlo ne tak'..path, ERROR) download_result = false return false end
 
-						status_text = 'скачан '..v.path
+						progress_download.text = (update and 'обновлен ' or 'скачан ')..v.path
 
-						file_count = file_count + 1
+					
 
+						d()
 						
-						table.remove(for_download, #for_download)
-						print(text)
-					--	Noti(text..' '..#for_download..' '..index, INFO)
-						if #for_download ==  0 then
-							Noti('ВСЕ ФАЙЛЫ СКАЧАНЫ УСПЕШНО ЗАПУЩЕНА ПРОВЕРКА'..path)
-
-							local is_ok = verify_files(downlanded_git)
-							status_text = 'Все'
-							--finish()
-						end
+						
 					end
 				end)
 			end
 			downlaod('Downloaded! '..v.path, v.update)
 		end
-		
+	end
 
-	end)
+	while download_result == nil do wait(0) end
+
+
+	return download_result
 end
 
 
-sampRegisterChatCommand('sfa_checkupd', update)
+setmetatable(update, {
+	__index = function (t, k)
+		msg(t, k)
+	end
+})
+
+
+
+
+sampRegisterChatCommand('upd', update.start)
+
+local imgui = require('mimgui')
+update.gui = function (self)
+	imgui.Begin('download_manage')
+	if imgui.Button('Download git') then
+		lua_thread.create(function ()
+			local res, d = self.download_git()
+			Noti(res and 'СКАЧАН ФАЙЛ' or 'НЕ УДАЛОСЬ СКАЧАТЬ', res and OK or ERROR) 
+		end)
+	end
+
+	if imgui.Button('Redownload files') then
+		lua_thread.create(function ()
+			local res = self.download_git()
+			if res then
+				print(#res)
+				self.download(res)
+			else
+				Noti('SOsni ', ERROR)
+			end
+-- =--Noti(res and 'СКАЧАН ФАЙЛ' or 'НЕ УДАЛОСЬ СКАЧАТЬ', res and OK or ERROR) 
+		end)
+
+
+	end
+
+	imgui.Text(u8(progress_download.text))
+	imgui.ProgressBar(progress_download.current / progress_download.start, {100, 20})
+
+	imgui.End()
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+imgui.OnFrame(function() return 1 end,
+function ()
+	update:gui()
+end)
+
+
+
+
+
 
 
 addEventHandler('onScriptTerminate', function(LuaScript, quitGame)

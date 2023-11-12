@@ -199,7 +199,7 @@ return
 					
 								b { t[i].name, t[i].icon, t[i].hint, t[i].func }
 
-								if imgui.IsItemClicked(1) then
+								if  cfg.debug and imgui.IsItemClicked(1) then
 									local form = string.format(getWorkingDirectory()..'\\lib\\1sfa\\select\\%s\\%s.lua', name_section, t[i].name)
 									os.execute('start explorer '..form)
 									print('run '..form)

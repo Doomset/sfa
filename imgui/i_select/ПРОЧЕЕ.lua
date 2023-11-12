@@ -143,7 +143,7 @@ return
 				cfg()
 			end
 			
-			if imgui.IsItemClicked(1) then
+			if cfg.debug and imgui.IsItemClicked(1) then
 				local line = debug.getinfo(1).currentline
 				msg(line)
 				os.execute(string.format('code --g "%s\\lib\\1sfa\\select\\other\\%s.lua:1"', getWorkingDirectory(), v[1]:trim()) )

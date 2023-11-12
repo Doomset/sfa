@@ -92,7 +92,7 @@ mod.Button = function(text, size, icon, center)
 
 
 
-    text = tsize2.x > size2.x and string.sub(text, 1, math.floor(size2.x / 4.2)) .. "..." or text --8
+    text = tsize2.x >   size2.x and string.sub(text, 1, math.floor(size2.x / 4.2)) .. "..." or text --8
 
     local tsize = imgui.CalcTextSize(text)
     size = size and imgui.ImVec2(size) or tsize

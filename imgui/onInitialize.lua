@@ -18,7 +18,7 @@ local load_fonts = function()
 
     imgui.GetIO().Fonts:AddFontFromFileTTF(getFolderPath(0x14) .. '\\trebucbd.ttf', first_font, nil, glyph_ranges)
 
-    for size = 12, 21 do
+    for size = 8, 21 do
         font[size] = imgui.GetIO().Fonts:AddFontFromFileTTF(getFolderPath(0x14) .. '\\trebucbd.ttf', size, nil, glyph_ranges)
     end
 

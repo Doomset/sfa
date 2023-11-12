@@ -10,107 +10,54 @@ imgui.Text =  extra.Text
 
 imgui.Separator = extra.Separator
 
-local binds_from_settings = cfg['Биндики']['Список']
+local que = cfg['Бинды'].que
+
+local binds_from_settings = cfg['Бинды'].list
 
 
 
 local gui = function ()
-
-    
     local get_all_keys = function ()
+        for index = 1, #binds_from_settings do    
+            imgui.Text(u8(que[index]))
+
+
+            for i, v in ipairs(binds_from_settings[index]) do
+
+                local b =new.bool(v.on)
+                if imgui.Checkbox('##'..i..index, b) then
+                    cfg['Бинды'].list[index][i].on = b[0]
+                    cfg()
+                end
+
+                imgui.SameLine()
+                if v.keys then
+                    for k, v2 in ipairs( (Edit_bind[2] and Edit_bind[2].name == v.name) and Edit_bind[2].keys or v.keys) do
+                        imgui.Button(v2)
     
+                        if k ~= #v.keys then imgui.SameLine(nil, 3) end
+                    end
+                else
+                    imgui.Button('-')
+                end
+                imgui.SameLine()
+                imgui.Text(u8(v.name))
+                imgui.SameLine()
+                if imgui.Button('edit##'..i) then
+                    Edit_bind ={i, v }
+                    if v.keys ~= nil then imgui.StrCopy(Bind_buf, table.concat(v.keys)) end
+                end
+                imgui.Separator()
 
-    
-
-
-
-
-    for i, v in ipairs(binds_from_settings) do
-        
-
-        if imgui.Checkbox('##'..i, new.bool(v.on)) then
-            v.on = not v.on
-            cfg['Биндики']['Список'][i].on = v.on
-            cfg()
-        end
-        imgui.SameLine()
-        if v.keys then
-            for k, v2 in ipairs( (Edit_bind[2] and Edit_bind[2].name == v.name) and Edit_bind[2].keys or v.keys) do
-                imgui.Button(v2)
-
-                if k ~= #v.keys then imgui.SameLine(nil, 3) end
-            end
-        else
-            imgui.Button('-')
-        end
-        
-        imgui.SameLine()
-
-        
-        -- if Edit_bind[1] == i then
-        --     os.clock()
-        -- end
-
-
-        imgui.Text(u8(v.name))
-
-
-        imgui.SameLine()
-        if imgui.Button('edit##'..i) then
-            Edit_bind ={i, v }
-            if v.keys ~= nil then imgui.StrCopy(Bind_buf, table.concat(v.keys)) end
-        end
-        imgui.Separator()
-
---        if  Edit_bind[2] and Edit_bind[2].name == v.name then imgui.InputText('', Bind_buf, sizeof(Bind_buf), imgui.InputTextFlags.ReadOnly) end
-    end
-
-    end
-    
-    get_all_keys()
-
-    -- if imgui.BeginPopupModal('addhot', _, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize) then
-
-    -- ---	if  then
-    --         --settings["Спам"]["Строки"][k] = u8:decode(str(hotname))
-    -- --	end
-    --     imgui.InputText("##name", hotname, sizeof(hotname))
-
-    --     imgui.InputTextMultiline('##lecteditortext', hotactrion, sizeof(hotactrion), imgui.ImVec2(400, 300))
-
-    -- --  imgui.InputTextWithHint('##imgui.InputTextWithHint', 'Big Text Hint Fuck Me', hotactrion, sizeof(hotactrion))
-
-        
-    --     imgui.SetCursorPos(imgui.GetCursorPos())
-    --     imgui.Text("dsdsdds")
-
-
-    --     if imgui.Button("ADD", {300, 15}) then
-    --         imgui.CloseCurrentPopup()
-    --         hot{
-    --             key = "Esc",
-    --             name = u8:decode(str(hotname)),
-    --             func = u8:decode(str(hotactrion)),
-    --             on = false,
-    --         }
-    --         cfg()
                 
-    --     end
-
-    --     imgui.EndPopup()
-    -- end
-   
+            end
+        end
+    end
+    get_all_keys()
 end
 
---[[
-    модуль хоткеев без соблюдения порядка нажатых клавиш
-]]
--- local req = require("mimgui")
 
--- local imgui = {}
--- package.loading["mimgui"] = nil
 local load_string, table_sort, copy_table = loadstring, table.sort, function(t) return {table.unpack(t)} end
-
 
 
 
@@ -119,42 +66,54 @@ local load_string, table_sort, copy_table = loadstring, table.sort, function(t) 
 
 local list =
 {
-    dick = binds_from_settings, -- ссыль на список биндов с настроек
+    dick =  copy_table(cfg['Бинды'].list), -- ссыль на список биндов с настроек
 
     hookKeys = function(self, keys_in_hook)
 
         local t = copy_table(self.dick)
 
 
-        
+        for i = 1, #t do
+            local v = t[i]
 
-        table_sort(t, function(a, b)
-           if a.keys == nil or b.keys == nil then return false end
-           return (#a.keys > #b.keys)
-        end)
+            table_sort(v, function(a, b)
+                if a.keys == nil or b.keys == nil then return false end
+                --print( #a.keys , #b.keys)
+                return (#a.keys > #b.keys)
+            end)
+        end
+     
 
   
 
         for i = 1, #t do
             local v = t[i]
 
-            if v.on and v.keys and not sampIsChatInputActive() and not sampIsDialogActive() then
-                local sovp, savp2 = #v.keys, 0
-                for i = 1, #keys_in_hook do
-                    for i2 = 1, #v.keys do
-                        if keys_in_hook[i] == v.keys[i2] then
-                            savp2 = savp2 + 1
-                            break
+            local br = false
+            
+            for i, v in ipairs(v) do
+
+                if v.on and v.keys and not sampIsChatInputActive() and not sampIsDialogActive() then
+                    local sovp, savp2 = #v.keys, 0
+                    for i = 1, #keys_in_hook do
+                        for i2 = 1, #v.keys do
+                            if keys_in_hook[i] == v.keys[i2] then
+                                savp2 = savp2 + 1
+                                break
+                            end
                         end
                     end
-                end
-                if sovp == savp2 then
-                    local res, reason = pcall(load_string(v.func))
-                    if reason then Noti(reason, INFO) end
-                    ot_list = self.dick;
-                    break;
+                    if sovp == savp2 then
+                        local res, reason = pcall(load_string(v.func))
+                        if reason then Noti(reason, INFO) end
+                        Noti(v.name, INFO)
+                        hot_list = self.dick;
+                        br = true
+                        break;
+                    end
                 end
             end
+            if br then break; end
         end
     end
 }
@@ -198,7 +157,7 @@ function()
     keys_down = {}
     if Edit_bind[2] ~= nil then
         msg(Edit_bind)
-        cfg['Биндики']['Список'][Edit_bind[1]] = Edit_bind[2]
+        cfg['Бинды'][Edit_bind[1]] = Edit_bind[2]
         Edit_bind[2] = nil
     end
 end

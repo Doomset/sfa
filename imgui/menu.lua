@@ -176,7 +176,7 @@ setmetatable(tabs,
                 end
 
                 if imgui.IsItemClicked(1) then
-                    local form = string.format(getWorkingDirectory()..'\\lib\\sfa\\imgui\\i_select\\%s.lua', self[i][2])
+                    local form = string.format(getWorkingDirectory()..'\\lib\\1sfa\\imgui\\i_select\\%s.lua', self[i][2])
                    -- if doesDirectoryExist(form) then
                         os.execute('start explorer '..form)
                         print('run '..form)
@@ -283,16 +283,18 @@ tabs._sfa = function()
 
     
 
-    if isKeyDown(18) and imgui.IsItemClicked(1) then
-        local line = debug.getinfo(1).currentline
-        msg(line)
-        os.execute(string.format('code --g "%s\\lib\\1sfa\\imgui\\menu.lua:201"', getWorkingDirectory()) )
-       -- end
-    elseif isKeyDown(18) and imgui.IsItemClicked(0) then
-        local line = debug.getinfo(1).currentline
-        msg(line)
-        os.execute(string.format('code --g "%s\\zsfa2.lua:1"', getWorkingDirectory()) )
-    end 
+    if  cfg.debug then
+        if isKeyDown(18) and imgui.IsItemClicked(1) then
+            local line = debug.getinfo(1).currentline
+            msg(line)
+            os.execute(string.format('code --g "%s\\lib\\1sfa\\imgui\\menu.lua:201"', getWorkingDirectory()) )
+        -- end
+        elseif isKeyDown(18) and imgui.IsItemClicked(0) then
+            local line = debug.getinfo(1).currentline
+            msg(line)
+            os.execute(string.format('code --g "%s\\zsfa2.lua:1"', getWorkingDirectory()) )
+        end 
+    end
     
 
    
@@ -301,7 +303,7 @@ tabs._sfa = function()
         for addon, _ in pairs(addons) do
             if select == addon then hotline(select:upper()) end
             if select ~= addon and imgui.Button(addon) then select = addon end;
-            if imgui.IsItemClicked(1) then
+            if cfg.debug and imgui.IsItemClicked(1) then
                 os.execute(string.format('code --g "%s\\lib\\1sfa\\addons\\%s.lua:1"', getWorkingDirectory(), addon) )
             end
            imgui.SameLine()
@@ -356,6 +358,9 @@ function(player)
        
 
 
+        imgui.PushFont(font[10])
+        imgui.Text('build '..cfg.build)
+        imgui.PopFont()
     end, imgui.WindowFlags.NoResize + imgui.WindowFlags.NoScrollbar + imgui.WindowFlags.NoScrollWithMouse + imgui.WindowFlags.NoCollapse)
 
 

@@ -139,7 +139,7 @@ end
 
 
 
-local function tableToString(tbl, indent)
+function tableToString(tbl, indent)
     local function formatTableKey(k)
         local defaultType = type(k);
         if (defaultType ~= 'string') then
