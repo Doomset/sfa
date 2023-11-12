@@ -47,6 +47,19 @@ local t = {
 		imgui.PushStyleColor(imgui.Col.ChildBg, imgui.GetStyle().Colors[imgui.Col.MenuBarBg])
 		imgui.PushStyleVarFloat(imgui.StyleVar.ChildRounding, 0)
 
+		local seletable = function (label, select, f)
+
+			if imgui.Selectable(u8(label), label == select, {120, 15}) then
+				self.select = label
+				
+				self.select_funcs = f
+				cfg.last.select['Õ¿—“–Œ… »'] = label
+				cfg()
+			end
+		end
+
+		
+
 		imgui.SetCursorPosY(3)
 		imgui.BeginChild("‚˚·Ó ‚ÍÎ‡‰ÓÍ - Ì‡ÒÚÓÈÍË", imgui.ImVec2(120, 287), true)
 		imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing, imgui.ImVec2(0.1, 1))
@@ -55,6 +68,7 @@ local t = {
 			cfg.debug = b[0]
 			cfg()
 		end
+		seletable('upd', self.select, update.gui)
 		for k, v in ipairs(self.functions) do
 			extra.Separator()
 			imgui.SetCursorPosY(imgui.GetCursorPos().y  + 4)
@@ -63,13 +77,7 @@ local t = {
 			imgui.PopFont()
 			imgui.PushFont(font[15])
 			for k2, v2 in ipairs(v) do
-				if imgui.Selectable(u8(v2[1]), v2[1] == self.select, {120, 15}) then
-					self.select = v2[1]
-					
-					self.select_funcs = v2.func
-					cfg.last.select['Õ¿—“–Œ… »'] = v2[1]
-					cfg()
-				end
+				seletable(v2[1], self.select, v2.func)
 
 				if cfg.debug and imgui.IsItemClicked(1) then
 					local line = debug.getinfo(1).currentline
@@ -98,6 +106,8 @@ local t = {
 			local res, reason = pcall(self.select_funcs)
 			if not res then imgui.Text(tostring(res)..'\n'..u8(reason or '')) end
 			if reason then
+
+				Noti(reason, ERROR)
 				
 				local name, reason2 = reason:match('(lib.+%.lua:%d+)(.+)')
 				
@@ -105,7 +115,7 @@ local t = {
 				print(name, '\n', reason)
 
 
-				if imgui.Button('go '..reason2) then
+				if imgui.Button('go '..(reason2 or '?')) then
 					os.execute(string.format('code --g "%s\\%s"', getWorkingDirectory(), name))
 				end
 			end

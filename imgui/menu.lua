@@ -143,9 +143,7 @@ setmetatable(tabs,
                 return res
             end
 
-            imgui.PushFont(font[24])
-            imgui.Text('DICK PENIS')
-            imgui.PopFont()
+    
             for i = 1, 3 do
                 local text_size = imgui.CalcTextSize(u8(self[i][2]))
                 local pos = {

@@ -1,5 +1,6 @@
 
 
+print(cfg['Пикапы']['2837.88'].id, 'modul')
 return
 {
     name = 'Хлам',
