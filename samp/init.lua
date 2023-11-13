@@ -5,6 +5,7 @@ require("sfa.samp.handlers")
 require("sfa.samp.zona")
 
 
+msg(1)
 
 local function getFilesInPath(path, ftype)
 	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
@@ -18,7 +19,7 @@ end
 
 for _, type in ipairs{"packets", "rpc"} do
     for _, in_out in ipairs{'incoming', 'outcoming'} do
-        for _, name_event in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\lib\\sfa\\samp\\" .. type.."\\"..in_out, '*.lua')) do
+        for _, name_event in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\sfa\\samp\\" .. type.."\\"..in_out, '*.lua')) do
             require('sfa.samp.' .. type .. '.' .. in_out..'.'..name_event:gsub("%.lua", ""))
         end
     end

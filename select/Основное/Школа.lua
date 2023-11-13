@@ -1,10 +1,13 @@
 
+local e = function (i)
+    repeat wait(0) until i
+end
+
 return
 {
     name = 'Школа',
     icon = 'SCHOOL',
-    hint = [[Тайник школьника, делается примерно минут за 15
-upd : функиця переписана, есть возможность отключить спавн. ПКМ для настройки]],
+    hint = [[Тайник школьника, делается примерно минут за 15]],
     func =
     function()
         local coords = {

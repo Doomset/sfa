@@ -1,7 +1,7 @@
 
 require('lib.samp.events').onSendDialogResponse = function(dialogId, button, listboxId, input)
 
-	msg(dialogId, button, listboxId, input)
+	--msg(dialogId, button, listboxId, input)
 	-- timer("окно с почтой", 3.6, function()
 	-- 	msg("GOё")
 	-- end)

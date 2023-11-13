@@ -9,6 +9,6 @@ return
         local _, x, y, z, type  = isAnyCheckpointExist()
         if not _ then return error("Нет чекпоинта",2) end
         NoKick()
-        SendSync{ pos = {x, y, z}}
+        SendSync{ pos = {x, y, z}, force = true}
     end
 }

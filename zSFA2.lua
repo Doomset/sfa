@@ -587,11 +587,6 @@ update.download = function (files)
 end
 
 
-setmetatable(update, {
-	__index = function (t, k)
-		msg(t, k)
-	end
-})
 
 
 -- for index, v in ipairs(files) do

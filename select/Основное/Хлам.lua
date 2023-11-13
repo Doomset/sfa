@@ -1,16 +1,14 @@
-
-
-print(cfg['Пикапы']['2837.88'].id, 'modul')
 return
 {
     name = 'Хлам',
     icon = 'DUMPSTER',
-    hint = [[cборка фейковой синхрой всех пикапов хлама в зоне.
-upd: обновлено, добавлена возможность выставлять задержку между этапами, возможность отключить спавн, ПКМ для настройки]],
+    hint = [[cборка фейковой синхрой всех пикапов хлама в зоне.]],
     func =
     function()
         NoKick()
         handler('dialog', {t = 'Рабочее место'})
+        handler('dialog', {t = 'Рабочее место', button = 0})
+        handler('player_pos', {2036.24})
         SendSync{ pos = {211, 2610, 17}, pick = cfg['Пикапы']['2837.88'].id, force = true}
         SendSync{ pos = {159, 2412, 18}, pick = cfg['Пикапы']['2588.92'].id, force = true}
         SendSync{ pos = {623, 2205, 24}, pick = cfg['Пикапы']['2851.63'].id, force = true}

@@ -9,6 +9,9 @@ require('lib.samp.events').onServerMessage = function(color, text)
 		cfg()
 	end
 
+	if text:find('Вас кикнуло') and color == -1439485014 then
+	end
+
 	 if cfg["Автопароль"]["Функции"]["Твинк"] and color == 267386880 and text:find("Вы пришли в себя в тюремном лазарете") then
 		local t = timer.exist("окно с почтой")
 		timer("твинк", t and t + 1.1 or 0.0, function()

@@ -1,14 +1,18 @@
 
 
-exSyncKey  = function(d)
+
+
+
+
+
+local exSyncKey  = function(d)
 	assert(type(d) == "table", "struct")
 	local p, key = d["pos"],   d["key"]
 	BlockSync = true
 	SendSync{pos = {p[1], p[2], p[3] - 12}, surf = 2333};
-    wait(1050);
+    wait(1100);
     SendSync{pos = {p[1], p[2], p[3]}, key = 1024, surf = 2333}
 end
-
 
 
 return

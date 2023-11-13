@@ -18,7 +18,7 @@ local binds_from_settings = cfg['Áèíäû'].list
 
 local gui = function ()
     local get_all_keys = function ()
-        for index = 1, #binds_from_settings do    
+        for index = 1, #binds_from_settings do
             imgui.Text(u8(que[index]))
 
 
@@ -73,15 +73,12 @@ local list =
         local t = copy_table(self.dick)
 
 
-        for i = 1, #t do
-            local v = t[i]
-
-            table_sort(v, function(a, b)
-                if a.keys == nil or b.keys == nil then return false end
-                --print( #a.keys , #b.keys)
-                return (#a.keys > #b.keys)
-            end)
-        end
+        -- for i = 1, #t do
+        --     local t = t[i]
+        --     for k, v in ipairs(t) do
+        --         if v.keys and #v.keys > #t[i][k].keys end
+        --     end
+        -- end
      
 
   

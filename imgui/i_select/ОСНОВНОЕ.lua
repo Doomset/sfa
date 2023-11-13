@@ -104,6 +104,9 @@ table.insert(Loaded_Icons, icon)
 table.insert(Loaded_Icons, "CAR")
 local noti = require('sfa.imgui.not')
 
+
+IsAnyFuncActiove = false
+
 return
 {
 	icon,
@@ -127,6 +130,7 @@ return
 					if id and id ~= -1 then sampSendExitVehicle(id) end
 					--print("¬€«¬¿Õ¿ ‘”Õ ÷»ﬂ ", v[1])
 --					timers.timeout = {os.clock(), 3}
+					IsAnyFuncActiove = true
 					self.active.name = v[1]
 					self.active.handle =
 
@@ -135,6 +139,7 @@ return
 						if reason then Noti(reason, ERROR) end
 						if res then Noti(string.format('%s -  OK', v[1]), OK) end
 						wait(0)
+						IsAnyFuncActiove = false
 						self.active.name = false
 						self.active.handle = false
 						ProcessLog = {}
@@ -164,7 +169,7 @@ return
 		for i=1, #self.functions do
 			local childp = imgui.GetCursorPos()
 			local index_section = i
-			if self.active.handle == false then
+			if IsAnyFuncActiove == false then
 				imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding, imgui.ImVec2(-0.2, -0.2))
 				imgui.BeginChild("selectedTab##"..i, childsize, 1, imgui.WindowFlags.MenuBar + imgui.WindowFlags.NoScrollbar)
 				imgui.PopStyleVar()

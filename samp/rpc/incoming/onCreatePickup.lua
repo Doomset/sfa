@@ -4,7 +4,7 @@ require('lib.samp.events').onCreatePickup = function(id, model, pickupType, pos)
 	local pick_data = cfg["Пикапы"][tostring(shortPos(pos.x, pos.y, pos.z))]
 
 	if pick_data and pick_data.id ~= id then
-		msg(pick_data.name.." не валид")
+		Noti(pick_data.name.." перезаписан!")
 		cfg["Пикапы"][tostring(shortPos(pos.x, pos.y, pos.z))].id = id
 		cfg()
 	end
