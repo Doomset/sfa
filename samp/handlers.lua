@@ -35,7 +35,7 @@ handler = setmetatable -- добавить таймаут
                             elseif name_handler == "player_pos" then
                                 local pos = data[1]
                                 if v[1] == shortPos(pos.x, pos.y, pos.z) then
-                                    SendSync{pos = pos} -- антиноп??!!!
+                                    SendSync{pos = {pos.x, pos.y, pos.z}} -- антиноп??!!!
                                     print('force sync antinope')
                                     return self:remove(name_handler, index, data)
                                 end

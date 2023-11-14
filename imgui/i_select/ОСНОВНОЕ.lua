@@ -44,7 +44,7 @@ end
 
 
 for i = 1, 3, 1 do -- если нет в конфиге элемента - добавляется из файла
-	for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\sfa\\select\\" .. list[i].name, '*.lua')) do
+	for _, v2 in ipairs(getFilesInPath(getWorkingDirectory().."\\sfa\\select\\" .. list[i].name, '*.lua')) do
 		v2 = v2:gsub('%.lua', '')
 		if not find(v2) then
 			require_function(i, #list[i].name + 1, list[i].name, v2)
@@ -105,6 +105,55 @@ table.insert(Loaded_Icons, "CAR")
 local noti = require('sfa.imgui.not')
 
 
+
+local ToU32 = imgui.ColorConvertFloat4ToU32
+local ToVEC = imgui.ColorConvertU32ToFloat4
+
+CircularProgressBar = function(value, radius, thickness, format)
+	local DL = imgui.GetWindowDrawList()
+	local p = imgui.GetCursorScreenPos()
+	local pos = imgui.GetCursorPos()
+	local ts = nil
+
+	if type(format) == 'string' then
+		format = string.format(format, value)
+		ts = imgui.CalcTextSize(format)
+	end
+
+	local side = imgui.ImVec2(
+		radius * 2 + thickness,
+		radius * 2 + thickness + (ts and (ts.y + imgui.GetStyle().ItemSpacing.y) or 0)
+	)
+	local centre = imgui.ImVec2(p.x + radius + (thickness / 2), p.y + radius + (thickness / 2))
+
+    imgui.BeginGroup()
+		imgui.Dummy(side) if imgui.IsItemClicked(0) then msg("DD") end
+
+		local corners = radius * 5
+	    local col_bg = ToU32(imgui.GetStyle().Colors[imgui.Col.FrameBg])
+	    local col = ToU32(imgui.GetStyle().Colors[imgui.Col.ButtonActive])
+	    local a1 = 90 - (360 / 100) * (value / 2)
+		local a2 = 90 + (360 / 100) * (value / 2)
+
+	    DL:AddCircle(centre, radius, col_bg, corners, thickness / 2)
+		DL:PathClear()
+        DL:PathArcTo(centre, radius, math.rad(a1) + imgui.GetTime() * 12, math.rad(a2)  + imgui.GetTime() * 12, corners)
+		DL:PathStroke(col, 0, thickness)
+	
+-- PathLineTo(ImVec2(centre.x + ImCos(a + ImGui::GetTime() * speed) * radius,
+--                centre.y + ImSin(a + ImGui::GetTime() * speed) * radius));
+
+	    if format ~= nil then
+	    	imgui.SetCursorPos(
+	    		imgui.ImVec2(
+	    			(pos.x + (side.x - ts.x) / 2) + 1.5,
+	    			(pos.y + radius * 2 + thickness + imgui.GetStyle().FramePadding.y) / 1.38
+	    		)
+	    	)
+	    	imgui.Text(format)
+	    end
+	imgui.EndGroup()
+end
 IsAnyFuncActiove = false
 
 return
@@ -230,15 +279,11 @@ return
 
 		if self.active.handle then
 
-			imgui.Text(self.state)
-
-			local l = ProcessLog
-			if #l>0 then
-				for i=1, #l do
-					imgui.Text(u8(l[i]))
-					imgui.SetScrollHereY(0)
-				end
-			end
+			extra.centerText(ProcessLog[#ProcessLog] or '')
+			local size = imgui.GetWindowSize()
+			imgui.SetCursorPos{size.x / 2 - 30, size.y / 2 - 50}
+			--свитч статусов как в радио ???
+			CircularProgressBar(20, 25, 5)
 		end
 
 		

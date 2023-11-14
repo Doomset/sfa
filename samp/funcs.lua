@@ -123,7 +123,7 @@ SendSync = function(t)
 
 	local s = samp_create_sync_data(t and ( (t.a or t.manual)  or state[1]) or state[1])
 
-	--if t and t.pos then setCharCoordinates(1, t.pos[1], t.pos[2], t.pos[3]) end
+	-- if t and t.pos then setCharCoordinates(1, t.pos[1], t.pos[2], t.pos[3]) end
 
 	if t then
 		print("SYNC", encodeJson(t), state[1])

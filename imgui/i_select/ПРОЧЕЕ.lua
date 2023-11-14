@@ -64,7 +64,7 @@ end
 
 
 
-for _, v2 in ipairs(getFilesInPath(getGameDirectory() .. "\\moonloader\\sfa\\select\\other" , '*.lua')) do
+for _, v2 in ipairs(getFilesInPath(getWorkingDirectory().."\\sfa\\select\\other" , '*.lua')) do
 	v2 = v2:gsub('%.lua', ''):trim()
 	if not find(v2) then
 		require_function(#list + 1, v2)
