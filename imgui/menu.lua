@@ -171,6 +171,7 @@ setmetatable(tabs,
                             self.current                             = i
                          
                             cfg.last.current = i
+                            cfg()
                             self.animate_child.switch(1)
                         end)
                     end
@@ -201,7 +202,10 @@ tabs.begin = function(self, func, flags)
 	imgui.PushStyleVarFloat(imgui.StyleVar.Alpha, a)
 
 	imgui.SetNextWindowSize(imgui.ImVec2(500 - a * -100,  300 - a * -100), 1)
-	imgui.SetNextWindowPos(imgui.ImVec2(res.x / 2 , (res.y / 2) ), 1, imgui.ImVec2(0.5, 0.5))
+	imgui.SetNextWindowPos(imgui.ImVec2(res.x / 2 , (res.y / 2) ), a > 0.99 and 2 or 1, imgui.ImVec2(0.5, 0.5))
+
+    
+
 	imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding, imgui.ImVec2(1, 1))
 	imgui.Begin("##Υσσσι", _, flags) imgui.PopStyleVar()
 	self.window_pos = imgui.GetWindowPos()
@@ -227,17 +231,6 @@ tabs.beginChild = function(self, func)
     imgui.PopStyleVar()
 end
 
-
-
-local function getFilesInPath(path, ftype)
-	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
-	table.insert(Files, File)
-	while File do
-		File = findNextFile(SearchHandle)
-		table.insert(Files, File)
-	end
-	return Files
-end
 
 
 

@@ -33,8 +33,13 @@ end
 
 local count_init = 0
 require = function(n)
-	-- n = n:gsub('sfa', '1sfa')
+	n = n:gsub('sfa', '1sfa')
 	local name = _require(n)
+
+	if n:find('sfa')  and true then
+
+		print(n)
+	end -- its not a lib!
 
 	local con, log = table.concat, trace
 
@@ -45,22 +50,10 @@ require = function(n)
 	return name
 end
 
-
 cfg = require('sfa.Config')(SFA_settings,  "\\sfa\\settings.json")
 
 
-
-
-function getFilesInPath(path, ftype)
-	local Files, SearchHandle, File = {}, findFirstFile(path .. "\\" .. ftype)
-	table.insert(Files, File)
-	while File do
-		File = findNextFile(SearchHandle)
-		table.insert(Files, File)
-	end
-	return Files
-end
-
+sampRegisterChatCommand('sfa_debug', function () cfg.debug = not cfg.debug; cfg(); end)
 
 
 ---@diagnostic disable: deprecated, lowercase-global, param-type-mismatch
@@ -113,6 +106,137 @@ if cfg.debug then
 	f:write(sfa_content)
 	f:close()
 end
+
+
+
+
+
+local effil = require 'effil' -- В начало скрипта
+
+
+
+
+function asyncHttpRequest(method, url, args, resolve, reject)
+	local request_thread = effil.thread(function (method, url, args)
+	   local requests = require 'requests'
+	   local result, response = pcall(requests.request, method, url, args)
+	   if result then
+		  response.json, response.xml = nil, nil
+		  return true, response
+	   else
+		  return false, response
+	   end
+	end)(method, url, args)
+	-- Если запрос без функций обработки ответа и ошибок.
+	if not resolve then resolve = function() end end
+	if not reject then reject = function() end end
+	-- Проверка выполнения потока
+	lua_thread.create(function()
+	   local runner = request_thread
+	   while true do
+		  local status, err = runner:status()
+		  if not err then
+			 if status == 'completed' then
+				local result, response = runner:get()
+				if result then
+				   resolve(response)
+				else
+				   reject(response)
+				end
+				return
+			 elseif status == 'canceled' then
+				return reject(status)
+			 end
+		  else
+			 return reject(err)
+		  end
+		  wait(0)
+	   end
+	end)
+end
+
+
+local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursive=1" -- закачка нового гита
+
+
+local git_tree = {}
+
+-- for i = 1, 3, 1 do -- если нет в конфиге элемента - добавляется из файла
+-- 	for _, v2 in ipairs(getFilesInPath(getWorkingDirectory().."\\sfa\\select\\" .. list[i].name, '*.lua')) do
+-- 		v2 = v2:gsub('%.lua', '')
+-- 		if not find(v2) then
+-- 			require_function(i, #list[i].name + 1, list[i].name, v2)
+-- 		end
+-- 	end
+-- end
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- asyncHttpRequest('GET', url_git, nil, function(resolve)
+-- 	--progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
+
+-- 	print(resolve.text)
+
+-- 	--local f = io.open(getWorkingDirectory()..'\\sfa\\test.json')
+
+-- 	git_tree = decodeJson(u8:decode(resolve.text)).tree
+	
+
+-- 	find('select/Основное')
+	
+-- 	downlanded_git = resolve.text
+-- 	--d(v.path)
+-- end, function(err)
+-- --	sms('Ошибка при отправке сообщения в Telegram!')
+-- end)
+
+
+function getFilesInPath(path, ftype)
+	local Files = {}
+	if not cfg.debug then
+		local find = function (path)
+			path = path:gsub('\\', '/')
+			for k, v in ipairs(git_tree) do
+			
+				--print(v.path, path)
+				local m = path..'/[A-zА-я0-9 ]+%.lua'
+				if v.path:find(m) then
+					table.insert(Files, v.path)
+				end
+			end
+		end
+		find(path)
+	else
+		local SearchHandle, File  = findFirstFile(getWorkingDirectory()..path .. "\\" .. ftype)
+		table.insert(Files, File)
+		while File do
+			File = findNextFile(SearchHandle)
+			table.insert(Files, File)
+		end
+	end
+	return Files
+end
+
+
+
+
+
+
+
+
+
+
+
 
 require 'sfa.samp'
 
@@ -197,7 +321,7 @@ WARN_ABUSE = function()
 	timer("abuse2", 6)
 end
 
-
+require('sampfuncs')
 
 
 lastcheck = {}
@@ -418,6 +542,7 @@ local download_thread = nil
 
 
 
+
 update = {}
 
 
@@ -436,21 +561,24 @@ update.download_git = function ()
 	
 	local downlanded_git, status_text = nil, 'загрузка конфига'
 
-	local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursive=1" -- закачка нового гита
-	downloadUrlToFile(url_git, git_path, function(id, status)
-		if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-			-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
-			downlanded_git = read_file(git_path) -- скачан новый
+	
 
-			if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
-				rename(1, git_path) -- вернуть наw
-				downlanded_git = false
-				return false, 'sosni'
-			end
+
+
+	-- downloadUrlToFile(url_git, git_path, function(id, status)
+	-- 	if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+	-- 		-- если что-то пойдет не так, оно откроет старый, это хууево, придется менять файлы
+	-- 		downlanded_git = read_file(git_path) -- скачан новый
+
+	-- 		if not downlanded_git then--тут надо скачаный  файл и проверить целостность структуры..
+	-- 			rename(1, git_path) -- вернуть наw
+	-- 			downlanded_git = false
+	-- 			return false, 'sosni'
+	-- 		end
 			
-			os.remove(git_path:gsub('data', 'old'))
-		end
-	end)
+	-- 		os.remove(git_path:gsub('data', 'old'))
+	-- 	end
+	-- end)
 
 
 	while downlanded_git == nil do status_text = 'ожидание файла конфига 'wait(0) end
@@ -565,18 +693,16 @@ update.download = function (files)
 
 		--if not path:find('%.git') then
 		--print(status, v.path)
-		downloadUrlToFile(url, path,
-		function(id, status, p1, p2)
-			process_update = true
-			progress_download.text = (v.update and 'обновляю ' or 'качаю ')..v.path
-			if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-                progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
-				d(v.path)
-			end
+
+		asyncHttpRequest('GET', url, nil, function(resolve)
+			progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
+			print(resolve.text)
+			d(v.path)
+		end, function(err)
+		--	sms('Ошибка при отправке сообщения в Telegram!')
 		end)
-		
-			
-		
+
+
 	end
 
 	while download_result == nil do wait(10) end
@@ -737,7 +863,81 @@ end
 
 
 
+-- local copas = require 'copas'
+-- local http = require 'copas.http'
+-- local requests = require 'requests'
+-- requests.http_socket, requests.https_socket = http, http
+
+-- function httpRequest(method, request, args, handler) -- lua-requests
+--     -- start polling task
+--     if not copas.running then
+--         copas.running = true
+--         lua_thread.create(function()
+--             wait(0)
+--             while not copas.finished() do
+--                 local ok, err = copas.step(0)
+--                 if ok == nil then error(err) end
+--                 wait(0)
+--             end
+--             copas.running = false
+--         end)
+--     end	
+--     -- do request
+--     if handler then
+--         return copas.addthread(function(m, r, a, h)
+--             copas.setErrorHandler(function(err) h(nil, err) end)
+--             h(requests.request(m, r, a))
+--         end, method, request, args, handler)
+--     else
+--         local results
+--         local thread = copas.addthread(function(m, r, a)
+--             copas.setErrorHandler(function(err) results = {nil, err} end)
+--             results = table.pack(requests.request(m, r, a))
+--         end, method, request, args)
+--         while coroutine.status(thread) ~= 'dead' do wait(0) end
+--         return table.unpack(results)
+--     end
+-- end
+
+
+-- for i = 1, 210, 1 do
+-- 	asyncHttpRequest('GET', 'https://raw.githubusercontent.com/Doomset/new/main/w.lua', nil, function(resolve)
+-- 		print(resolve.text)
+-- 		package.preload['test'] = loadstring(resolve.text)
+-- 		require('test')
+-- 	end, function(err)
+-- 	--	sms('Ошибка при отправке сообщения в Telegram!')
+-- 	end)
+	
+-- end
 
 
 
 
+
+-- local list = {
+-- 	
+
+-- }
+
+-- -- параллельные запросы, обработаются одновременно
+-- print('parallel')
+-- for i, url in ipairs(list) do
+--     print('request', url)
+--     
+-- -- end
+-- 
+
+
+-- function(response, code, headers, status)
+-- 	if response then
+-- 		print(url, 'OK', response.text)
+-- 		package.preload[n] = loadstring(response.text)
+-- 		local n = require(n)
+-- 	else
+-- 		print(url, 'Error', code)
+-- 	end
+-- end
+-- if err then error(err) end
+-- local json_data = response.json()
+-- print(response.text, 'allah')
