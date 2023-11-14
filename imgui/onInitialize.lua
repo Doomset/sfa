@@ -1,5 +1,4 @@
-local mod_gui, req = "mimgui"
-local imgui = require(mod_gui)
+local imgui = require("mimgui")
 
 
 
@@ -122,6 +121,8 @@ imgui.OnInitialize(function()
     style_color[imgui.Col.NavWindowingDimBg]     = vec4(0.80, 0.80, 0.80, 0.20)
     style_color[imgui.Col.ModalWindowDimBg]      = vec4(0.00, 0.00, 0.00, 0.70)
 end)
+
+print('module loaded!!!!')
 
 require('sfa.imgui.onScreen')
 require('sfa.imgui.menu')
