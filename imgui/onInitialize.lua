@@ -1,5 +1,5 @@
 print('trying load mod')
-local imgui = require("mimgui")
+local imgui = _require("mimgui")
 
 
 
