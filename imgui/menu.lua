@@ -32,7 +32,7 @@ for i = 1, 3 do setmetatable(tabs[i], {__index = tabs}) end -- изменить число
 menu = tabs.animate
 setmetatable(menu , extra.ui_meta)
 setmetatable(tabs.animate_child, extra.ui_meta)
-
+    
 
 sampRegisterChatCommand('sfa', function(arg)
     menu.switch()
