@@ -36,10 +36,7 @@ require = function(n)
 	n = n:gsub('sfa', '1sfa')
 	local name = _require(n)
 
-	if n:find('sfa')  and true then
-
-		print(n)
-	end -- its not a lib!
+	if n:find('sfa') then end -- its not a lib!
 
 	local con, log = table.concat, trace
 
@@ -50,10 +47,11 @@ require = function(n)
 	return name
 end
 
+
 cfg = require('sfa.Config')(SFA_settings,  "\\sfa\\settings.json")
 
 
-sampRegisterChatCommand('sfa_debug', function () cfg.debug = not cfg.debug; cfg(); end)
+
 
 
 ---@diagnostic disable: deprecated, lowercase-global, param-type-mismatch
@@ -161,78 +159,29 @@ local url_git = "https://api.github.com/repos/doomset/sfa/git/trees/main?recursi
 
 local git_tree = {}
 
--- for i = 1, 3, 1 do -- если нет в конфиге элемента - добавляется из файла
--- 	for _, v2 in ipairs(getFilesInPath(getWorkingDirectory().."\\sfa\\select\\" .. list[i].name, '*.lua')) do
--- 		v2 = v2:gsub('%.lua', '')
--- 		if not find(v2) then
--- 			require_function(i, #list[i].name + 1, list[i].name, v2)
--- 		end
--- 	end
--- end
+
+--for _, v2 in ipairs(getFilesInPath(getWorkingDirectory().."\\sfa\\select\\" .. list[i].name, '*.lua')) do 
 
 
 
 
+asyncHttpRequest('GET', url_git, nil, function(resolve)
+	--progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
 
+	print(resolve.text)
 
+	--local f = io.open(getWorkingDirectory()..'\\sfa\\test.json')
 
-
-
-
-
-
-
--- asyncHttpRequest('GET', url_git, nil, function(resolve)
--- 	--progress_download.text = (v.update and 'обновлен ' or 'скачан ')..v.path
-
--- 	print(resolve.text)
-
--- 	--local f = io.open(getWorkingDirectory()..'\\sfa\\test.json')
-
--- 	git_tree = decodeJson(u8:decode(resolve.text)).tree
+	git_tree = decodeJson(resolve.text).tree
 	
 
--- 	find('select/Основное')
+	print(git_tree)
 	
--- 	downlanded_git = resolve.text
--- 	--d(v.path)
--- end, function(err)
--- --	sms('Ошибка при отправке сообщения в Telegram!')
--- end)
-
-
-function getFilesInPath(path, ftype)
-	local Files = {}
-	if not cfg.debug then
-		local find = function (path)
-			path = path:gsub('\\', '/')
-			for k, v in ipairs(git_tree) do
-			
-				--print(v.path, path)
-				local m = path..'/[A-zА-я0-9 ]+%.lua'
-				if v.path:find(m) then
-					table.insert(Files, v.path)
-				end
-			end
-		end
-		find(path)
-	else
-		local SearchHandle, File  = findFirstFile(getWorkingDirectory()..path .. "\\" .. ftype)
-		table.insert(Files, File)
-		while File do
-			File = findNextFile(SearchHandle)
-			table.insert(Files, File)
-		end
-	end
-	return Files
-end
-
-
-
-
-
-
-
+	downlanded_git = resolve.text
+	--d(v.path)
+end, function(err)
+--	sms('Ошибка при отправке сообщения в Telegram!')
+end)
 
 
 

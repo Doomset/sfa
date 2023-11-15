@@ -1,6 +1,5 @@
 render_radar_art = {}
 local imgui = require 'mimgui'
-local ac = require'sfa.samp.zona.AntiCheat'
 
 local icon = require('sfa.imgui.icon')
 local ffi = require('ffi')
