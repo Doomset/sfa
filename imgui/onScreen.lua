@@ -1,7 +1,12 @@
 render_radar_art = {}
 local imgui = require 'mimgui'
 
-local icon = require('sfa.imgui.icon')
+
+local icon = icon
+lua_thread.create(function ()
+    icon = require('sfa.imgui.icon')
+end)
+
 local ffi = require('ffi')
 
 local getBonePosition = ffi.cast("int (__thiscall*)(void*, float*, int, bool)", 0x5E4280)
