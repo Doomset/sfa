@@ -41,7 +41,7 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
 	for k, v in ipairs(cfg["Диалоги"]["Список"]) do
 		if v.on and title:find(v.title) then
 			sampSendDialogResponse(id, v.button, v.select, v.input)
-			addConsole('settings["Диалоги"]["Список"]', "Послан ответ дииалог ", id, v.button, v.select, v.input) 
+			print('settings["Диалоги"]["Список"]', "Послан ответ дииалог ", id, v.button, v.select, v.input) 
 			return false
 		end
 	end
@@ -75,11 +75,11 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
 
 	local f = title
 	if cfg["Автопароль"]["Статус"] and ( f:find('Окно Регистрации') or f:find('Выберите пол персонажа') or f:find('Регистрация реферала') or f:find('Окно Входа') ) then
-		if cfg["Автопароль"]["Любой акк"].on then sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or cfg["Автопароль"]["Любой акк"].pass)  addConsole("AUTOLOGIN") return false end
+		if cfg["Автопароль"]["Любой акк"].on then sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or cfg["Автопароль"]["Любой акк"].pass)  print("AUTOLOGIN") return false end
 		local myid = select(2, sampGetPlayerIdByCharHandle(PLAYER_PED))
 		for k, v in ipairs(cfg["Автопароль"]["Функции"]["Акки"]) do
 			if v.on and (string.lower(v.nick) == string.lower(sampGetPlayerNickname(myid))) then
-				addConsole("AUTOLOGIN")
+				print("AUTOLOGIN")
 				sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or v.pass)
 				return false 
 			end
@@ -108,17 +108,17 @@ function sampev.onShowTextDraw(id, data)
 
 	if ez == 945 then indicatorArts = id end
 
-	if ez == 2 and cfg["Метро и сон"]["Функции"]["Затемнение"] then addConsole('["Метро и сон"]["Функции"]["Затемнение"]', "Заблокирован текстдрав с затемнением") return false end
+	if ez == 2 and cfg["Метро и сон"]["Функции"]["Затемнение"] then print('["Метро и сон"]["Функции"]["Затемнение"]', "Заблокирован текстдрав с затемнением") return false end
 
 
 
 	if ez == 201 and cfg["Автовзлом"]["Отмычка"] ~= id then
 		cfg["Автовзлом"]["Отмычка"] = id -- отмычка
-		addConsole("АВТОВЗЛОМ перезапись отмычки")
+		print("АВТОВЗЛОМ перезапись отмычки")
 		cfg()
 	elseif ez == -50 and cfg["Автовзлом"]["Отмычка открыть"] ~= id then
 		cfg["Автовзлом"]["Отмычка открыть"] = id -- открыть
-		addConsole("АВТОВЗЛОМ перезапись замка")
+		print("АВТОВЗЛОМ перезапись замка")
 		cfg()
 	end
 
@@ -134,7 +134,7 @@ function sampev.onPlaySound(soundId, position)
 	lastSoundId = { id = soundId, on = false }
 	if soundId == 36401 and sampTextdrawIsExists(cfg["Автовзлом"]["Отмычка открыть"]) and cfg["Автовзлом"]["Статус"] then
 		blockNextTd = true
-		addConsole("АВТОВЗЛОМ использование отмычки")
+		print("АВТОВЗЛОМ использование отмычки")
 		sampSendClickTextdraw(cfg["Автовзлом"]["Отмычка открыть"]) --open
 	end
 end
@@ -189,7 +189,7 @@ function sampev.onSetPlayerPos(pos)
 
     print("player_pos сервер установил позицию ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
 
-    addConsole("player_pos ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
+    print("player_pos ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
 
     if BlockSyncJob then return false end
 end
@@ -220,7 +220,7 @@ end
 function sampev.onSetCheckpoint(p, radius)
 	takecheck(p)
 	handler("checkpoints", {p})
-	lastcheck[#lastcheck + 1] = {p.x, p.y, p.z}
+	CheckpointsDebug[#CheckpointsDebug + 1] = {p.x, p.y, p.z}
 end
 
 
@@ -228,7 +228,7 @@ end
 function sampev.onSetRaceCheckpoint(type, p, nextPosition, size)
 	takecheck(p)
 	handler("checkpoints", {p})
-	lastcheck[#lastcheck + 1] = {p.x, p.y, p.z}
+	CheckpointsDebug[#CheckpointsDebug + 1] = {p.x, p.y, p.z}
 end
 
 -- -176.05770874023, 1163.03125, 24.686134338379
@@ -272,7 +272,7 @@ function sampev.onSetPlayerAttachedObject(playerId, index, create, object)
 		if not v.on then return end
 		for _, obj in pairs(v.list) do
 			if object.modelId == obj.data.id then
-				addConsole("PlayerAttachedObject", object.modelId, "удалён")
+				print("PlayerAttachedObject", object.modelId, "удалён")
 				return false
 			end
 		end
@@ -326,16 +326,16 @@ function sampev.onServerMessage(color, text)
 
 	for k, v in ipairs(cfg["Спам"]["Строки"]) do
 		if text:find(v.text) and color == v.color then
-			addConsole('settings["Спам"]["Строки"]', "ServerMessage block", color, text)
+			print('settings["Спам"]["Строки"]', "ServerMessage block", color, text)
 			return false
 		end
 	end	
 
-	addConsole (string.format("handler('onServerMessage', {text = '%s', color = %d})", text, color))
+	print (string.format("handler('onServerMessage', {text = '%s', color = %d})", text, color))
 
 	if text == 'Чтобы пробудиться ото сна введите .проснуться' and color == 267386880 and cfg["Метро и сон"]["Функции"]["Проснуться"] then
 		sampSendChat("/проснуться")
-		addConsole("/проснуться", '[Метро и сон"]["Функции"]["Проснуться"]')
+		print("/проснуться", '[Метро и сон"]["Функции"]["Проснуться"]')
 	end
 
 	if handler.has("onServerMessage", {color, text}) then return false end

@@ -8,7 +8,7 @@ if shortPos(pos.x, pos.y, pos.z) == 1310.6 then msg("Блок спавна на платформе)")
 
 print("player_pos сервер установил позицию ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
 
-addConsole("player_pos ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
+print("player_pos ",pos.x, pos.y, pos.z, shortPos(pos.x, pos.y, pos.z))
 
 if BlockSyncJob then return false end
 end

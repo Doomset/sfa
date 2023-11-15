@@ -23,7 +23,7 @@ require('lib.samp.events').onSetPlayerAttachedObject = function(playerId, index,
 	-- 	if not v.on then return end
 	-- 	for _, obj in pairs(v.list) do
 	-- 		if object.modelId == obj.data.id then
-	-- 			addConsole("PlayerAttachedObject", object.modelId, "удалён")
+	-- 			print("PlayerAttachedObject", object.modelId, "удалён")
 	-- 			return false
 	-- 		end
 	-- 	end

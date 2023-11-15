@@ -3,7 +3,16 @@ local imgui = require("mimgui")
 
 
 
-Loaded_Icons = {}
+Loaded_Icons = {"arrow_left", 'ARROWS_ROTATE', "TRASH", "ARROW_DOWN", "ARROW_UP", "GEAR", "MAGNIFYING_GLASS"}
+
+setmetatable(Loaded_Icons, {__newindex = function (self, k, v2)
+    for k, v in ipairs(self) do
+        if v == v2 then return end
+    end
+end})
+
+
+
 local load_icons = function ()
    
     require('sfa.imgui.icon').init_icons()

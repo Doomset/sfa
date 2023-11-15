@@ -90,6 +90,9 @@ local function RusToEng(tex, en)
         insert(str, (en and lasen or lasng)[word] or word)
 	end; return concat(str)
 end
+
+local weapons = require 'game.weapons'
+
 weapons.names[44] = nil; weapons.names[45] = nil
 пушка = function(par)
     local f, q, w = RusToEng(par, true):lower()

@@ -55,6 +55,7 @@ handler = setmetatable -- добавить таймаут
                             elseif name_handler == 'surf' then
                                 return v.surfingVehicleId
                             end
+                        
                         end
                         return false
                     end
@@ -73,7 +74,7 @@ handler = setmetatable -- добавить таймаут
 
             table.insert(self[type], data or { t = "" })
 
-            timer("timeout_handlers_" .. tostring(data), t or 5, function()
+            timer("timeout_handlers_" .. tostring(data), t or 10, function()
                 local index = #self[type]
                 print(encodeJson(self[type][index]))
                 self[type][index] = nil

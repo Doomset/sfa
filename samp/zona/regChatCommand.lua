@@ -2,13 +2,6 @@
 
 
 
-sampRegisterChatCommand('lc', function(arg)
-
-
-	setClipboardText("decodeJson('"..encodeJson(lastcheck).."')")
-
-
-end)
 
 
 
@@ -183,84 +176,15 @@ sampRegisterChatCommand('v', function(par)
 end)
 
 
-
+CheckpointsDebug = {}
 sampRegisterChatCommand('lc', function(arg)
-
-
-	setClipboardText("decodeJson('"..encodeJson(lastcheck).."')")
-
-
+	setClipboardText("decodeJson('"..encodeJson(CheckpointsDebug).."')")
 end)
 
 
 
 
 
-
-
-sampRegisterChatCommand('s', function(arg)
-
-	local file = io.open("C:\\Users\\SHAITANMACHINE\\Desktop\\parse\\xxxxxx.txt", 'r')
-
-	for line in file:lines() do
-		local nick = line:match(".+:(.+)")
-		if nick then
-			table.insert(nicks, nick)
-		end
-	end
-
-
-	local nicks2 =
-	{
-	"Vlad_Hardy",
-	"undead",
-	"Bruno_Falenkton",
-	"DEVASTATE",
-	"Dmitry_Daster",
-	"Tennessee",
-	"Kion_",
-	--"Trio",
-	"Rohan",
-	"Makarona",
-	"KuzyaHuilo",
-	"VecnoMolodoy",
-	"dosie_mijik",
-	"RipperTape",
-	"Duraley",
-	"Poryadok",
-	"Heaven",
-
-
-	"Mebel",
-
-	"Ben_Tyu",
-
-	"MiIfHunter" ,
-
-
-	"locyash",
-
-
-
-	"mirotvorec_",
-	"Doppio_",
-	"_Grinberg",
-	"valakita",
-	"morningsleep",
-	"Kion_",
-	"_math_",
-	"Staffford",
-	"Dazzle",
-	}
-
-
-	for k, v in ipairs(nicks2) do
-		table.insert( nicks, 500, v)
-	end
-
-	file:close()
-
-end)
 
 
 

@@ -80,7 +80,7 @@ return
 
         local veh_id, x, y, z = autobus()
 
-        if not veh_id then error('Рядом нет автобуса!') return end
+        if not veh_id then error('Рядом нет автобуса!', 0) return end
         
 
         

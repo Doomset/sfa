@@ -43,16 +43,16 @@ require('lib.samp.events').onServerMessage = function(color, text)
 
 	for k, v in ipairs(cfg["Спам"]["Строки"]) do
 		if text:find(v.text) and color == v.color then
-			addConsole('settings["Спам"]["Строки"]', "ServerMessage block", color, text)
+			print('settings["Спам"]["Строки"]', "ServerMessage block", color, text)
 			return false
 		end
 	end
 
-	addConsole (string.format("handler('onServerMessage', {text = '%s', color = %d})", text, color))
+	print (string.format("handler('onServerMessage', {text = '%s', color = %d})", text, color))
 
 	if text == 'Чтобы пробудиться ото сна введите .проснуться' and color == 267386880 and cfg["Метро и сон"]["Функции"]["Проснуться"] then
 		sampSendChat("/проснуться")
-		addConsole("/проснуться", '[Метро и сон"]["Функции"]["Проснуться"]')
+		print("/проснуться", '[Метро и сон"]["Функции"]["Проснуться"]')
 	end
 
 	if handler.has("onServerMessage", {color, text}) then return false end

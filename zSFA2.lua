@@ -18,7 +18,7 @@ script_properties("work-in-pause")
 
 -- require "ziplib.dll"
 consolLog = {}
-addConsole = function(...)
+print = function(...)
 	print(...)
 	table.insert(consolLog, table.concat({...}, ", "))
 end
@@ -273,7 +273,7 @@ end
 require('sampfuncs')
 
 
-lastcheck = {}
+CheckpointsDebug = {}
 
 
 

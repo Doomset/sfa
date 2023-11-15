@@ -16,6 +16,8 @@ local list =
 
 
 
+
+
 local require_function = function(section, pos, section_name, name)
 	local req = require('sfa.select.' .. section_name .. '.' .. name)
 	table.insert(list[section], pos, req)
@@ -25,6 +27,17 @@ end
 
 
 local campare = cfg.sort['основное']
+
+for i = 1, #campare do
+	setmetatable(campare[i], {__newindex = function (self, k, v2)
+		for k, v in ipairs(self[i]) do
+			print(v)
+			if v == v2 then print(v) return end
+		end
+	end})
+end
+
+
 for i = 1, 3, 1 do -- запрос порядок функций из кфг
 	for pos, table_1 in ipairs(campare[i]) do
 		require_function(i, pos, list[i].name, table_1)
@@ -156,6 +169,13 @@ CircularProgressBar = function(value, radius, thickness, format)
 end
 IsAnyFuncActiove = false
 
+local Action_SFA = {}
+pL = function(...)
+	table.insert(Action_SFA, ...)
+end
+
+local scan = require('sfa.samp.zona.AntiCheat').scan
+
 return
 {
 	icon,
@@ -175,7 +195,7 @@ return
 				imgui.SetCursorPos(p)
 					if ((input.is_clicked and #input.chars > 0) and imgui.IsItemClicked(0) or (but(u8(v[1]), size, not imgui.IsItemHovered() and v[2] or false))) then
 					input:null()
-					local id = check_car()
+					local id = scan()
 					if id and id ~= -1 then sampSendExitVehicle(id) end
 					--print("ВЫЗВАНА ФУНКЦИЯ ", v[1])
 --					timers.timeout = {os.clock(), 3}
@@ -191,7 +211,7 @@ return
 						IsAnyFuncActiove = false
 						self.active.name = false
 						self.active.handle = false
-						ProcessLog = {}
+						
 					end)
 
 				end
@@ -279,7 +299,7 @@ return
 
 		if self.active.handle then
 
-			extra.centerText(ProcessLog[#ProcessLog] or '')
+			extra.centerText(Action_SFA[#Action_SFA] or '')
 			local size = imgui.GetWindowSize()
 			imgui.SetCursorPos{size.x / 2 - 30, size.y / 2 - 50}
 			--свитч статусов как в радио ???

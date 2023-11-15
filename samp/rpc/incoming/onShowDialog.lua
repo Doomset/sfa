@@ -45,7 +45,7 @@ require('lib.samp.events').onShowDialog = function(id, style, title, button1, bu
 	for k, v in ipairs(cfg["Диалоги"]["Список"]) do
 		if v.on and title:find(v.title) then
 			sampSendDialogResponse(id, v.button, v.select, v.input)
-			addConsole('settings["Диалоги"]["Список"]', "Послан ответ дииалог ", id, v.button, v.select, v.input)
+			print('settings["Диалоги"]["Список"]', "Послан ответ дииалог ", id, v.button, v.select, v.input)
 			return false
 		end
 	end
@@ -83,13 +83,13 @@ if handler.has("dialog", {id, title}) then return false end
 
 		if attempt_to_login ~= 0 and f:find('Окно Входа') then msg('не правильный пароль, автологин оффнут во избежании кика') cfg["Автопароль"]["Статус"] = false return end
 
-		if cfg["Автопароль"]["Любой акк"].on then sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or cfg["Автопароль"]["Любой акк"].pass) addConsole("AUTOLOGIN") return false end
+		if cfg["Автопароль"]["Любой акк"].on then sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or cfg["Автопароль"]["Любой акк"].pass) print("AUTOLOGIN") return false end
 		local myid = select(2, sampGetPlayerIdByCharHandle(PLAYER_PED))
 
 
 		for k, v in ipairs(cfg["Автопароль"]["Функции"]["Акки"]) do
 			if v.on and (string.lower(v.nick) == string.lower(sampGetPlayerNickname(myid))) then
-				addConsole("AUTOLOGIN")
+				print("AUTOLOGIN")
 				sampSendDialogResponse(id, 1, -1, f:find('Регистрация реферала') and " " or v.pass)
 				return false
 			end
