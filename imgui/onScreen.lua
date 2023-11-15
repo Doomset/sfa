@@ -2,10 +2,7 @@ render_radar_art = {}
 local imgui = require 'mimgui'
 
 
-local icon
-lua_thread.create(function ()
-    icon = require('sfa.imgui.icon')
-end)
+local icon= require('sfa.imgui.icon')
 
 local ffi = require('ffi')
 
