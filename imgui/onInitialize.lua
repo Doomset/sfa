@@ -125,7 +125,9 @@ end)
 
 print('module loaded!!!!')
 
-require('sfa.imgui.onScreen')
-require('sfa.imgui.menu')
 
-require('sfa.imgui.not')
+lua_thread.create(function()
+    require('sfa.imgui.onScreen')
+    require('sfa.imgui.menu')
+    require('sfa.imgui.not')
+end)
