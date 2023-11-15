@@ -5,12 +5,13 @@ local imgui = require("mimgui")
 
 
 local load_icons = function ()
+    Loaded_Icons = {}
     require('sfa.imgui.icon').init_icons()
 end
 
 
 
-
+font = {}
 local load_fonts = function()
     local first_font = 13
     local glyph_ranges = imgui.GetIO().Fonts:GetGlyphRangesCyrillic()
@@ -122,8 +123,6 @@ imgui.OnInitialize(function()
     style_color[imgui.Col.NavWindowingDimBg]     = vec4(0.80, 0.80, 0.80, 0.20)
     style_color[imgui.Col.ModalWindowDimBg]      = vec4(0.00, 0.00, 0.00, 0.70)
 end)
-
-print('module loaded!!!!')
 
 
 
