@@ -1,5 +1,5 @@
 local imgui, button = nil, nil
-
+local weapons = require 'game.weapons'
 
 local t = {}
     for k, v in pairs(weapons.names) do

@@ -68,7 +68,7 @@ local t = {
 			cfg.debug = b[0]
 			cfg()
 		end
-		seletable('upd', self.select, update.gui)
+--		seletable('upd', self.select, update.gui)
 		for k, v in ipairs(self.functions) do
 			extra.Separator()
 			imgui.SetCursorPosY(imgui.GetCursorPos().y  + 4)

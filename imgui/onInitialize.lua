@@ -3,9 +3,9 @@ local imgui = require("mimgui")
 
 
 
-
+Loaded_Icons = {}
 local load_icons = function ()
-    Loaded_Icons = {}
+   
     require('sfa.imgui.icon').init_icons()
 end
 
