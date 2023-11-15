@@ -1,5 +1,4 @@
-SFA_settings =
-{
+SFA_settings = {
 
 	build = '',
 	autoupdate = false,
